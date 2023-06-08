@@ -5,6 +5,9 @@ from tkinter import messagebox
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 
+# Constants
+NR_TOP_URLS = 5000
+
 # Load the firefox profile with extensions
 options = Options()
 options.add_argument("-profile")
@@ -14,20 +17,20 @@ options.add_argument("5jqn9t8w.blockerProfile")
 driver = webdriver.Firefox(options=options)
 driver.maximize_window()
 
-# Determine how many is already done
-start = 0
-if os.path.exists("data/top5000.csv"):
-    with open("data/top5000.csv", "r") as f:
-        start = sum(1 for line in f)-1
+# Determine how many URLs are already labeled
+nr_labels = 0
+if os.path.exists("data/labeled_urls.csv"):
+    with open("data/labeled_urls.csv", "r") as f:
+        nr_labels = sum(1 for line in f)-1
 else:
-    with open("data/top5000.csv", "w", newline='') as f:
+    with open("data/labeled_urls.csv", "w", newline='') as f:
         writer = csv.writer(f)
         writer.writerow(["URL", "usesAntiAdBlocker"])
 
-# Load the top 5000 urls that have not been loaded yet
+# Load the top URLs that have not been labeled yet
 with open("data/top-1m.csv", "r") as f:
     reader = csv.reader(f)
-    urls = [row[1] for i, row in enumerate(reader) if i >= start and i < 5000]
+    urls = [row[1] for i, row in enumerate(reader) if i >= nr_labels and i < NR_TOP_URLS]
 
 # Loop over the URLs
 for url in urls:    
@@ -39,8 +42,6 @@ for url in urls:
         root.withdraw()
         answer = messagebox.askyesnocancel(title="Label site", message="Does this site use an anti adblocker?", default="no")
         if answer == None:
-            # Quit the selenium instance
-            driver.quit()
             break
         # Save HTML page source
         pageSource = driver.page_source
@@ -49,11 +50,18 @@ for url in urls:
         # Save screenshot
         driver.save_screenshot(f"data/screenshots/{url}.png")
         # Save label
-        with open('data/top5000.csv', 'a', newline='') as f:
+        with open('data/labeled_urls.csv', 'a', newline='') as f:
             writer = csv.writer(f)
             writer.writerow([url, answer])
     except:
         print(f"There was an exception with {url}")
-        with open('data/top5000.csv', 'a', newline='') as f:
+        with open('data/labeled_urls.csv', 'a', newline='') as f:
             writer = csv.writer(f)
             writer.writerow([url, None])
+
+# Quit the selenium instance
+driver.quit()
+# Print the number of labeled URLs
+with open("data/labeled_urls.csv", "r") as f:
+    nr_labels = sum(1 for line in f)-1
+print(f"You have labeled {nr_labels} URLs in total.")
