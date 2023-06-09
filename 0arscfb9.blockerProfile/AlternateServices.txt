@@ -1,0 +1,7 @@
+https:push.services.mozilla.com:443:.::3	0	19517	https:push.services.mozilla.com:443:push.services.mozilla.com:443::n:1686297193:h3:n:1686297157:n::|n:y:
+https:support.mozilla.org:443:.:^partitionKey=%28https%2Cmozilla.org%29:3	0	19517	https:support.mozilla.org:443:support.mozilla.org:443::n:1686297545:h3:n:1686297157:n:^partitionKey=%28https%2Cmozilla.org%29:|n:y:
+https:r5---sn-5hnednsz.gvt1.com:443:.::3	0	19517	https:r5---sn-5hnednsz.gvt1.com:443:r5---sn-5hnednsz.gvt1.com:443::n:1686297219:h3:n:1686297157:n::|n:y:
+https:archive.mozilla.org:443:.::3	0	19517	https:archive.mozilla.org:443:archive.mozilla.org:443::n:1686297219:h3:n:1686297157:n::|n:y:
+https:safebrowsing.googleapis.com:443:.:^firstPartyDomain=safebrowsing.86868755-6b82-4842-b301-72671a0db32e.mozilla:3	0	19517	https:safebrowsing.googleapis.com:443:safebrowsing.googleapis.com:443::n:1686297205:h3:n:1686297157:n:^firstPartyDomain=safebrowsing.86868755-6b82-4842-b301-72671a0db32e.mozilla:|n:y:
+https:redirector.gvt1.com:443:.::3	0	19517	https:redirector.gvt1.com:443:redirector.gvt1.com:443::n:1686297219:h3:n:1686297157:n::|n:y:
+https:welcome.adblockplus.org:443:.:^partitionKey=%28https%2Cadblockplus.org%29:3	0	19517	https:welcome.adblockplus.org:443:welcome.adblockplus.org:443::n:1686297303:h3:n:1686297157:n:^partitionKey=%28https%2Cadblockplus.org%29:|n:y:

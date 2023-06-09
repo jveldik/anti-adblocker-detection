@@ -11,8 +11,7 @@ NR_TOP_URLS = 5000
 # Load the firefox profile with extensions
 options = Options()
 options.add_argument("-profile")
-options.add_argument("5jqn9t8w.blockerProfile")
-# options.set_preference('profile', "5jqn9t8w.blockerProfile")
+options.add_argument("0arscfb9.blockerProfile")
 # Set up the Selenium firefox browser
 driver = webdriver.Firefox(options=options)
 driver.maximize_window()
