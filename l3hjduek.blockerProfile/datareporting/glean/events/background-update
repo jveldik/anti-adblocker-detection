@@ -1,4 +1,0 @@
-{"timestamp":0,"category":"nimbus_events","name":"enrollment","extra":{"experiment_type":"rollout","branch":"control","experiment":"abouthome-startup-cache-rollout","enrollment_id":"63c40ba4-724d-4255-ae23-0a47ef2d7d16"}}
-{"timestamp":38,"category":"nimbus_events","name":"enrollment","extra":{"branch":"control","enrollment_id":"13228dd8-5e8e-47df-8d2d-074944b43dfa","experiment":"firefox-accounts-toolbar-button-badge","experiment_type":"rollout"}}
-{"timestamp":58,"category":"nimbus_events","name":"enrollment","extra":{"experiment":"next-generation-accessibility-engine-powering-screen-readers","enrollment_id":"aedf7f84-100f-4076-ae98-f930b1e5646c","branch":"treatment-a","experiment_type":"rollout"}}
-{"timestamp":114,"category":"nimbus_events","name":"enrollment","extra":{"experiment_type":"rollout","enrollment_id":"08830778-f2da-45f4-93aa-66228b051587","experiment":"use-additional-tiles-for-sponsored-shortcuts","branch":"control"}}
