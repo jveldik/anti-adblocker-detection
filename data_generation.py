@@ -8,7 +8,7 @@ from selenium.webdriver.firefox.options import Options
 # Constants
 NR_TOP_URLS = 5000
 
-# Load the firefox profile with extensions
+# Load the firefox profile with AdGuard extension
 options = Options()
 options.add_argument("-profile")
 options.add_argument("l3hjduek.blockerProfile")
