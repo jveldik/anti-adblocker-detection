@@ -11,7 +11,7 @@ NR_TOP_URLS = 5000
 # Load the firefox profile with AdGuard extension
 options = Options()
 options.add_argument("-profile")
-options.add_argument("l3hjduek.blockerProfile")
+options.add_argument("883r2o43.blockerProfile")
 # Set up the Selenium firefox browser
 driver = webdriver.Firefox(options=options)
 driver.maximize_window()
