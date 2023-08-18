@@ -1,54 +1,77 @@
 import os
-import re
-import ast
-from collections import defaultdict
+import requests
+from bs4 import BeautifulSoup
+from slimit.parser import Parser
+from slimit.visitors.nodevisitor import ASTVisitor
+
+# Create a visitor class for feature extraction
+class FeatureExtractor(ASTVisitor):
+    def __init__(self):
+        self.feature_sets = {
+            'all': {},
+            'literal': {},
+            'keyword': {}
+        }
+
+    def visit_Object(self, node):
+        # Visit object literal
+        for prop in node:
+            left, right = prop.left, prop.right
+            #print 'Property key=%s, value=%s' % (left.value, right.value)
+            # Visit all children in turn
+            self.visit(prop)
+
+# Function to fetch and process external JavaScript content
+def fetch_external_js(url, source):
+    print(url)
+    print(source)
+    if source.startswith('/'):
+        url = f"{url}{source}"
+    else:
+        url = source
+    
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.text
+    return ""
 
 # Function to extract JavaScript code from HTML file
 def extract_scripts(html_path):
-    js_code = ""
+    scripts = ""
     with open(html_path, 'r', encoding='utf-8') as f:
-        html_code = f.read()
-        # Using regular expression to find <script> tags and extract JavaScript code
-        script_tags = re.findall(r'<script.*?>(.*?)<\/script>', html_code, re.DOTALL)
-        scripts = '\n'.join(script_tags)
+        html_code = BeautifulSoup(f.read(), 'html.parser')
+        url = "http://" + html_path.replace('data/page_sources/', '').replace('.html', '')
+        script_tags = html_code.find_all("script")
+        
+        for source_tag in script_tags:
+            source = source_tag.get('src')
+            if source:
+                script_content = fetch_external_js(url, source)
+                if script_content:
+                    scripts += script_content + "\n"
+            else:
+                scripts += f"{source_tag.string}\n"
+    print(scripts)
     return scripts
 
 # Function to extract features from JavaScript code
 def extract_features(scripts):
-    # Parse JavaScript code into AST
-    script_asts = ast.parse(scripts)
+    parser = Parser()
+    tree = parser.parse(scripts)
     
-    # Initialize feature dictionaries for different feature types
-    feature_sets = {
-        'all': defaultdict(int),
-        'literal': defaultdict(int),
-        'keyword': defaultdict(int)
-    }
+    extractor = FeatureExtractor()
+    extractor.visit(tree)
     
-    # Traverse the AST to extract features
-    for node in ast.walk(script_asts):
-        if isinstance(node, ast.stmt):
-            context = type(node).__name__
-            text = ast.dump(node)
-            text_elements = text.split()
-            
-            for feature_set in feature_sets:
-                if feature_set == 'literal':
-                    text_elements = [el for el in text_elements if el.isnumeric() or el.startswith('"') or el.startswith("'")]
-                elif feature_set == 'keyword':
-                    text_elements = [el for el in text_elements if el in {'for', 'while', 'try', 'except', 'if', 'switch'}]
-                
-                feature = f"{context} :: {' '.join(text_elements)}"
-                feature_sets[feature_set][feature] += 1
-    
-    return feature_sets
+    return extractor.feature_sets
 
 # Iterate through HTML files and extract features
-page_sources_path = "data/page_sources"
+page_sources_path = "data/page_sources/"
 for file in os.listdir(page_sources_path):
     if file.endswith('.html'):
         html_path = os.path.join(page_sources_path, file)
         scripts = extract_scripts(html_path)
         feature_sets = extract_features(scripts)
-        print(f"Features extracted from {file}:\n{feature_sets}")
+        print(f"Features extracted from {file}:")
+        for name, features in feature_sets.items():
+            print(name, features)
         break
