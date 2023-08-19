@@ -1,2 +1,2 @@
-slimit==0.8.1
-ply==3.4
+esprima=4.0.1
+selenium=4.9.0

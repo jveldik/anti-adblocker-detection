@@ -1,71 +1,76 @@
 import os
-import requests
-from bs4 import BeautifulSoup
-from slimit.parser import Parser
-from slimit.visitors.nodevisitor import ASTVisitor
+import esprima
 
-# Create a visitor class for feature extraction
-class FeatureExtractor(ASTVisitor):
-    def __init__(self):
-        self.feature_sets = {
-            'all': {},
-            'literal': {},
-            'keyword': {}
-        }
-
-    def visit_Object(self, node):
-        # Visit object literal
-        for prop in node:
-            left, right = prop.left, prop.right
-            #print 'Property key=%s, value=%s' % (left.value, right.value)
-            # Visit all children in turn
-            self.visit(prop)
-
-# Function to fetch and process external JavaScript content
-def fetch_external_js(url, source):
-    if source.startswith('/'):
-        url = f"{url}{source}"
-    else:
-        url = source
+# Function to extract features from JavaScript code using esprima
+def extract_features(feature_sets, script):
+    tokenized_script = esprima.tokenize(script)
+    parsed_script = esprima.parseScript(script)
+    print(tokenized_script)
+    print(parsed_script)
+    print(script)
     
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.text
-    return ""
-
-# Function to extract JavaScript code from HTML file
-def extract_scripts(html_path):
-    scripts = []
-    with open(html_path, 'r', encoding='utf-8') as f:
-        html_code = BeautifulSoup(f.read(), 'html.parser')
-        url = "http://" + html_path.replace('data/page_sources/', '').replace('.html', '')
-        script_tags = html_code.find_all("script")
-        
-        for source_tag in script_tags:
-            source = source_tag.get('src')
-            if source:
-                script_content = fetch_external_js(url, source)
-                if script_content:
-                    scripts.append(script_content)
-            else:
-                scripts.append(source_tag.string)
-    return scripts
-
-# Function to extract features from JavaScript code
-def extract_features(parser, extractor, scripts):
-    for script in scripts:
-        tree = parser.parse(script)
-        extractor.visit(tree)
-        break
+    return feature_sets
 
 # Iterate through HTML files and extract features
-page_sources_path = "data/page_sources/"
-parser = Parser()
-extractor = FeatureExtractor()
-for file in os.listdir(page_sources_path):
+script_sources_path = "data/scripts/"
+feature_sets = {
+        'all': set(),
+        'literal': set(),
+        'keyword': set()
+    }
+
+for file in os.listdir(script_sources_path):
     if file.endswith('.html'):
         html_path = os.path.join(page_sources_path, file)
         scripts = extract_scripts(html_path)
-        feature_sets = extract_features(parser, extractor, scripts)
+        for script in scripts:
+            feature_sets = extract_features(feature_sets, script)
+            break
         break
-print(extractor.feature_sets)
+print(feature_sets)
+script = """
+function BlockAdBlock(options) {
+    this._options = options || {};
+    this._var = {};
+    this.init();
+}
+
+BlockAdBlock.prototype.init = function() {
+    this._var.bait = null;
+    this._creatBait();
+    this._checkBait(true);
+};
+
+BlockAdBlock.prototype._creatBait = function() {
+    var bait = document.createElement('div');
+    bait.setAttribute('class', this._options.baitClass);
+    bait.setAttribute('style', this._options.baitStyle);
+    this._var.bait = window.document.body.appendChild(bait);
+    this._var.bait.offsetParent;
+    this._var.bait.offsetHeight;
+    this._var.bait.offsetLeft;
+    this._var.bait.offsetTop;
+    this._var.bait.offsetWidth;
+    this._var.bait.clientHeight;
+    this._var.bait.clientWidth;
+    if (this._options.debug === true) {
+        this._log('_creatBait', 'Bait has been created');
+    }
+};
+
+BlockAdBlock.prototype._checkBait = function(loop) {
+    var detected = false;
+    if (window.document.body.getAttribute('abp') !== null ||
+        this._var.bait.offsetParent === null ||
+        this._var.bait.offsetHeight === 0 ||
+        this._var.bait.offsetLeft === 0 ||
+        this._var.bait.offsetTop === 0 ||
+        this._var.bait.offsetWidth === 0 ||
+        this._var.bait.clientHeight === 0 ||
+        this._var.bait.clientWidth === 0) {
+        detected = true;
+    }
+};
+"""
+feature_sets = extract_features(feature_sets, script)
+print(feature_sets)
