@@ -1,3 +1,5 @@
+import os
+import pickle
 import esprima
 
 scripts = ["""if (new Date().getHours() < 18) {
@@ -50,7 +52,7 @@ scripts = ["""if (new Date().getHours() < 18) {
 ]
 
 # Function to recursively extract features from an AST
-def extract_features(node, context, all_features, literal_features, identifier_features):
+def extract_features(node, context, feature_sets):
     if isinstance(node, esprima.nodes.Node):
         node_type = node.type
         current_context = context + [node_type]
@@ -61,33 +63,53 @@ def extract_features(node, context, all_features, literal_features, identifier_f
         else:
             text = ''
         if text:
-            all_features.append(('.'.join(current_context), text))
+            feature_sets[0].append(('.'.join(current_context), text))
             if node_type == 'Literal':
-                literal_features.append(('.'.join(current_context), text))
+                feature_sets[1].append(('.'.join(current_context), text))
             else:
-                identifier_features.append(('.'.join(current_context), text))
+                feature_sets[2].append(('.'.join(current_context), text))
 
         for key, value in node.items():
             if isinstance(value, (list, esprima.nodes.Node)):
-                extract_features(value, current_context, all_features, literal_features, identifier_features)
+                extract_features(value, current_context, feature_sets)
     elif isinstance(node, list):
         for item in node:
-            extract_features(item, context, all_features, literal_features, identifier_features)
+            extract_features(item, context, feature_sets)
 
 # Parse JavaScript code and extract features
-def extract_features_from_js(script, all_features, literal_features, identifier_features):
+def extract_features_from_js(script, feature_sets):
     try:
         ast = esprima.parseScript(script)
-        return extract_features(getattr(ast, 'body'), [], all_features, literal_features, identifier_features)
+        extract_features(getattr(ast, 'body'), [], feature_sets)
     except Exception as e:
         print(f"Error parsing JavaScript code: {e}")
-        return []
+
+def filter_features(features, number_of_features):
+    # Remove duplicates
+    features = list(set(features))
+    return features[:number_of_features]
 
 all_features = []
 literal_features = []
 identifier_features = []
-for script in scripts:
-    extract_features_from_js(script, all_features, literal_features, identifier_features)
+feature_sets = [all_features, literal_features, identifier_features]
+scripts_map_path = "data/scripts/"
+for dir in os.listdir(scripts_map_path):
+    url_path = os.path.join(scripts_map_path, dir)
+    if os.path.isdir(url_path):
+        for dir in os.listdir(url_path):
+            script_path = os.path.join(url_path, dir)
+            if dir.endswith('.js'):
+                with open(script_path, 'r', encoding='utf-8') as f:
+                    script = f.read()
+                    extract_features_from_js(script, feature_sets)
+
+set_names = ["all", "literal", "identifiers"]
+for (features, set_name)  in zip(feature_sets, set_names):
+    for number_of_features in [100, 1000, 10000]:
+        features = filter_features(features, number_of_features)
+        with open(f"data/feature_sets/{set_name}_{number_of_features}.pickle", 'wb') as f:
+            pickle.dump(features, f)
     
 print(all_features)
 print(literal_features)
