@@ -35,6 +35,7 @@ def extract_scripts(session, html_path):
 
 page_sources_path = "data/page_sources/"
 session = requests.Session()
+session.timeout = 5
 session.headers.update({'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"})
 for dir in os.listdir(page_sources_path):
     url = dir.replace('.html', '')
