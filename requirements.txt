@@ -1,4 +1,6 @@
-easygui=0.98.3
+beautifulsoup4==4.11.1
 esprima=4.0.1
+Pillow==9.0.1
+requests==2.31.0
 selenium=4.9.0
 tensorflow=2.13.0
