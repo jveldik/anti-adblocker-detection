@@ -75,7 +75,7 @@ def visit_url(driver, session, url):
         driver.get(f"http://{url}")
         # Wait for the page to load
         sleep(5)
-        while url == driver.current_url or driver.execute_script("return document.readyState") != "complete":
+        while driver.execute_script("return document.readyState") != "complete":
             sleep(1)
     except:
         with open("data/stored_urls.csv", "a", newline='') as file:
