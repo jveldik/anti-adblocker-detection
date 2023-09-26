@@ -4,3 +4,4 @@ Pillow==9.0.1
 requests==2.31.0
 selenium=4.9.0
 tensorflow=2.13.0
+urlextract=1.8.0

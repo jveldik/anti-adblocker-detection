@@ -6,9 +6,10 @@ import requests
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from urllib.parse import urlparse
+from urlextract import URLExtract
 
 # Constants
-NR_TOP_URLS = 5000
+NR_TOP_URLS = 5
 
 def get_number_of_stored_urls():
     # Determine how many URLs are already stored
@@ -38,16 +39,25 @@ def create_session():
     return session
 
 def fetch_external_js(session, url, source):
-    if source.startswith('/'):
-        url = f"{url}{source}"
+    extractor = URLExtract()
+    if extractor.has_urls(source):
+        while source.startswith('/'):
+            source = source[1:]
+        if source.startswith("http"):
+            url = source
+        else:
+            url = f"https://{source}"
     else:
-        url = source
+        if source.startswith('/'):
+            url = f"https://{url}{source}"
+        else:
+            url = f"https://{url}/{source}"
     try:
         response = session.get(url)
         response.raise_for_status()
         return response.text
     except:
-        print(f"Error fetching {url}")
+        print(f"Error fetching {url} from the source: {source}")
         return ""
 
 def save_script(url, index, script):
@@ -74,9 +84,9 @@ def visit_url(driver, session, url):
         # Use Selenium to load the URL
         driver.get(f"http://{url}")
         # Wait for the page to load
-        sleep(5)
         while driver.execute_script("return document.readyState") != "complete":
-            sleep(1)
+            sleep(5)
+        sleep(5)
     except:
         with open("data/stored_urls.csv", "a", newline='') as file:
             writer = csv.writer(file)
