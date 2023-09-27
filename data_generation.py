@@ -1,4 +1,5 @@
 import csv
+import multiprocessing
 import os.path
 from time import sleep
 from bs4 import BeautifulSoup
@@ -9,7 +10,8 @@ from urllib.parse import urlparse
 from urlextract import URLExtract
 
 # Constants
-NR_TOP_URLS = 5
+NR_TOP_URLS = 5000
+WAITING_TIME = 120
 
 def get_number_of_stored_urls():
     # Determine how many URLs are already stored
@@ -34,7 +36,6 @@ def create_driver():
 
 def create_session():
     session = requests.Session()
-    session.timeout = 5
     session.headers.update({'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"})
     return session
 
@@ -53,12 +54,11 @@ def fetch_external_js(session, url, source):
         else:
             url = f"https://{url}/{source}"
     try:
-        response = session.get(url)
+        response = session.get(url, timeout=5)
         response.raise_for_status()
         return response.text
     except:
         print(f"Error fetching {url} from the source: {source}")
-        return ""
 
 def save_script(url, index, script):
     if script:
