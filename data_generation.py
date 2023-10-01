@@ -9,24 +9,20 @@ from selenium.webdriver.firefox.options import Options
 from urllib.parse import urlparse
 from urlextract import URLExtract
 
-# Constants
 NR_TOP_URLS = 5000
-WAITING_TIME = 120
 
-def get_number_of_stored_urls():
-    # Determine how many URLs are already stored
-    if os.path.exists("data/stored_urls.csv"):
-        with open("data/stored_urls.csv", "r") as file:
-            return sum(1 for line in file)-1
+def get_nr_visited_urls():
+    if os.path.exists("data/nr_visited_urls.txt"):
+        with open("data/nr_visited_urls.txt", "r") as file:
+            content = file.read()
+            return int(content)
     else:
-        with open("data/stored_urls.csv", "w", newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["URL", "Redirect"])
-            return 0
+        return 0
 
 def create_driver():
     # Load the firefox profile with adblocker extension
     options = Options()
+    options.add_argument('-headless')
     options.add_argument("-profile")
     options.add_argument("883r2o43.blockerProfile")
     # Set up the Selenium firefox browser
@@ -57,6 +53,8 @@ def fetch_external_js(session, url, source):
         response = session.get(url, timeout=5)
         response.raise_for_status()
         return response.text
+    except KeyboardInterrupt:
+        raise KeyboardInterruptException()
     except:
         print(f"Error fetching {url} from the source: {source}")
 
@@ -66,7 +64,7 @@ def save_script(url, index, script):
             f.write(script)
 
 # Function to extract JavaScript code from HTML code
-def extract_scripts(session, page_source, url, current_url):
+def extract_scripts(session, page_source, url):
     soup = BeautifulSoup(page_source, 'lxml')
     script_tags = soup.find_all("script")
     # Create folder for storing scripts
@@ -74,12 +72,12 @@ def extract_scripts(session, page_source, url, current_url):
     for index, source_tag in enumerate(script_tags):
         source = source_tag.get('src')
         if source:
-            script_content = fetch_external_js(session, current_url, source)
+            script_content = fetch_external_js(session, url, source)
             save_script(url, index, script_content)
         else:
             save_script(url, index, source_tag.string)
 
-def visit_url(driver, session, url):
+def visit_url(driver, session, url, nr_visited_urls):
     try:
         # Use Selenium to load the URL
         driver.get(f"http://{url}")
@@ -87,40 +85,52 @@ def visit_url(driver, session, url):
         while driver.execute_script("return document.readyState") != "complete":
             sleep(5)
         sleep(5)
+        
+        current_url = urlparse(driver.current_url).netloc
+        # Check if current url is already visited
+        if os.path.exists(f"data/screenshots/{current_url}.png"):
+            print(f"URL #{nr_visited_urls} was already stored. ({current_url})")
+        else:
+            # Save scripts
+            page_source = driver.page_source
+            extract_scripts(session, page_source, current_url)
+            # Save screenshot
+            driver.save_screenshot(f"data/screenshots/{current_url}.png")
+            # Save the current url
+            with open("data/stored_urls.txt", "a", newline='') as file:
+                file.write(f"{current_url}\n")
+            print(f"URL #{nr_visited_urls} is stored. ({current_url})")
+    except KeyboardInterrupt:
+        raise KeyboardInterrupt
     except:
-        with open("data/stored_urls.csv", "a", newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([url, ""])
-        return False
-    # Save scripts
-    page_source = driver.page_source
-    current_url = urlparse(driver.current_url).netloc
-    extract_scripts(session, page_source, url, current_url)
-    # Save screenshot
-    driver.save_screenshot(f"data/screenshots/{url}.png")
-    # Save the current url
-    with open("data/stored_urls.csv", "a", newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow([url, current_url])
-    return True
+        print(f"URL #{nr_visited_urls} caused an exception. ({url})")
   
-nr_urls = get_number_of_stored_urls()
+nr_visited_urls = get_nr_visited_urls()
 driver = create_driver()
 session = create_session()
 
 # Load the top URLs that have not been stored yet
 with open("data/top-1m.csv", "r") as file:
     reader = csv.reader(file)
-    urls = [row[1] for i, row in enumerate(reader) if i >= nr_urls and i < NR_TOP_URLS]
+    urls = [row[1] for i, row in enumerate(reader) if i >= nr_visited_urls and i < NR_TOP_URLS]
 
-# Loop over the URLs
-for url in urls:
-    print(f"Storing {url}")
-    nr_urls += 1
-    if visit_url(driver, session, url):
-        print(f"URL #{nr_urls} is stored. ({url})")
-    else:
-        print(f"URL #{nr_urls} caused an exception. ({url})")
+try:
+    # Loop over the URLs
+    for url in urls:
+        print(f"Storing {url}")
+        visit_url(driver, session, url, nr_visited_urls)
+        nr_visited_urls += 1
+except KeyboardInterrupt:
+    print("You stopped the script.")
+finally:
+    # Quit the selenium instance
+    driver.quit()
 
-# Quit the selenium instance
-driver.quit()
+    # Save number of visited urls
+    with open("data/nr_visited_urls.txt", "w") as file:
+        file.write(str(nr_visited_urls))
+
+    # Print the number of stored urls
+    with open("data/stored_urls.txt", 'r') as file:
+        nr_stored_urls = sum(1 for line in file if line.strip())
+        print(f"{nr_stored_urls} urls are stored.")
