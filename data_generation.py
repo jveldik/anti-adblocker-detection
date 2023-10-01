@@ -77,8 +77,9 @@ def extract_scripts(session, page_source, url):
         else:
             save_script(url, index, source_tag.string)
 
-def visit_url(driver, session, url, nr_visited_urls):
+def visit_url(driver, session, url):
     try:
+        print(f"Visiting {url}")
         # Use Selenium to load the URL
         driver.get(f"http://{url}")
         # Wait for the page to load
@@ -89,7 +90,7 @@ def visit_url(driver, session, url, nr_visited_urls):
         current_url = urlparse(driver.current_url).netloc
         # Check if current url is already visited
         if os.path.exists(f"data/screenshots/{current_url}.png"):
-            print(f"URL #{nr_visited_urls} was already stored. ({current_url})")
+            print(f"{current_url} was already stored")
         else:
             # Save scripts
             page_source = driver.page_source
@@ -99,11 +100,11 @@ def visit_url(driver, session, url, nr_visited_urls):
             # Save the current url
             with open("data/stored_urls.txt", "a", newline='') as file:
                 file.write(f"{current_url}\n")
-            print(f"URL #{nr_visited_urls} is stored. ({current_url})")
+            print(f"{current_url} is stored")
     except KeyboardInterrupt:
         raise KeyboardInterrupt
     except:
-        print(f"URL #{nr_visited_urls} caused an exception. ({url})")
+        print(f"{url} caused an exception")
   
 nr_visited_urls = get_nr_visited_urls()
 driver = create_driver()
@@ -117,11 +118,10 @@ with open("data/top-1m.csv", "r") as file:
 try:
     # Loop over the URLs
     for url in urls:
-        print(f"Storing {url}")
-        visit_url(driver, session, url, nr_visited_urls)
+        visit_url(driver, session, url)
         nr_visited_urls += 1
 except KeyboardInterrupt:
-    print("You stopped the script.")
+    print("You stopped the script")
 finally:
     # Quit the selenium instance
     driver.quit()
@@ -133,4 +133,4 @@ finally:
     # Print the number of stored urls
     with open("data/stored_urls.txt", 'r') as file:
         nr_stored_urls = sum(1 for line in file if line.strip())
-        print(f"{nr_stored_urls} urls are stored.")
+        print(f"{nr_stored_urls} urls are stored")
