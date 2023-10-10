@@ -1,39 +1,49 @@
 import csv
 import pickle
-from sklearn import svm
+import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
+from tensorflow import keras
+from tensorflow.keras import layers
 
 # Load the saved matrices and feature sets
-def load_data(set_name, numer_of_features):
+def load_data(set_name, number_of_features):
     labels = []
-    with open("data/labeled_urls.csv", mode = 'r') as file:
+    with open("data/labeled_urls.csv", mode='r') as file:
         reader = csv.reader(file)
         for row in reader:
             if row[1] == "True":
                 labels.append(True)
             elif row[1] == "False":
                 labels.append(False)
-    with open(f"data/matrices/{set_name}_{numer_of_features}.pickle", 'rb') as f:
+    with open(f"data/matrices/{set_name}_{number_of_features}.pickle", 'rb') as f:
         matrix = pickle.load(f)
     return labels, matrix
 
-# Change set_name and numer_of_features as needed
+# Change set_name and number_of_features as needed
 set_name = "all"
-numer_of_features = 10000
+number_of_features = 10000
+
 # Load feature matrix and labels
-labels, matrix = load_data(set_name, numer_of_features)
+labels, matrix = load_data(set_name, number_of_features)
+
 # Split the data into training and testing sets (80% train, 20% test)
 X_train, X_test, y_train, y_test = train_test_split(matrix, labels, test_size=0.2, random_state=42)
 
-# Initialize the SVM classifier
-clf = svm.SVC()
+# Create a simple neural network model
+model = keras.Sequential()
+model.add(layers.InputLayer(input_shape=(X_train.shape[1],)))
+model.add(layers.Dense(64, activation='relu'))
+model.add(layers.Dense(1, activation='sigmoid'))
 
-# Train the classifier on the training data
-clf.fit(X_train, y_train)
+# Compile the model
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Train the model
+model.fit(X_train, y_train, epochs=10, batch_size=32, validation_split=0.2)
 
 # Make predictions on the test data
-y_pred = clf.predict(X_test)
+y_pred = (model.predict(X_test) > 0.5).astype(int).flatten()
 
 # Calculate accuracy
 accuracy = accuracy_score(y_test, y_pred)
