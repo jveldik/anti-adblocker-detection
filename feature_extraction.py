@@ -48,10 +48,12 @@ def extract_features():
     with open("data/labeled_urls.csv", mode = 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            if row and row[1]:
-                url = row[0]
-                labels.append(bool(row[1]))
-                extract_features_from_url(url, feature_lists)
+            if row[1] == "True":
+                labels.append(True)
+                extract_features_from_url(row[0], feature_lists)
+            elif row[1] == "False":
+                labels.append(False)
+                extract_features_from_url(row[0], feature_lists)
     return feature_lists, labels
 
 def create_matrices(feature_lists):
