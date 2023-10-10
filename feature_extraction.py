@@ -5,25 +5,25 @@ import esprima
 from scipy.sparse import lil_matrix
 from sklearn.feature_selection import chi2, SelectKBest, VarianceThreshold
 
-# Function to recursively extract features from an AST
+# Function to extract features from an AST
 def extract_features_from_AST(node, new_features):
-    if isinstance(node, esprima.nodes.Node):
-        if node.type == 'Literal':
-            text = str(node.value)
-            if text and len(text) < 50:
-                new_features[0].append(text)
-                new_features[1].append(text)
-        elif node.type == 'Identifier':
-            text = str(node.name)
-            if text and len(text) < 50:
-                new_features[0].append(text)
-                new_features[2].append(text)
-        for key, value in node.items():
-            if isinstance(value, (list, esprima.nodes.Node)):
-                extract_features_from_AST(value, new_features)
-    elif isinstance(node, list):
-        for item in node:
-            extract_features_from_AST(item, new_features)
+    stack = [node]
+    while stack:
+        current_node = stack.pop()
+        if isinstance(current_node, esprima.nodes.Node):
+            if current_node.type == 'Literal':
+                text = str(current_node.value)
+                if text and len(text) < 50:
+                    new_features[0].append(text)
+                    new_features[1].append(text)
+            elif current_node.type == 'Identifier':
+                text = str(current_node.name)
+                if text and len(text) < 50:
+                    new_features[0].append(text)
+                    new_features[2].append(text)
+            stack += reversed([value for key, value in current_node.items() if isinstance(value, (list, esprima.nodes.Node))])
+        elif isinstance(current_node, list):
+            stack += reversed(current_node)
 
 def extract_features_from_url(url, feature_lists):
     new_features = [[],[],[]]
@@ -37,9 +37,9 @@ def extract_features_from_url(url, feature_lists):
                 error_log.write(f"Error parsing JavaScript code with {url}/{dir}: {e}\n")
             continue
         extract_features_from_AST(getattr(ast, 'body'), new_features)
-    feature_lists[0].append(new_features[0])
-    feature_lists[1].append(new_features[1])
-    feature_lists[2].append(new_features[2])
+    for feature_list, url_features in zip(feature_lists, new_features):
+        url_features = list(set(url_features))
+        feature_list.append(url_features)
     print(f"Extracted features from {url}")
 
 def extract_features():
@@ -73,7 +73,7 @@ def create_matrices(feature_lists):
                 index = feature_index_map.get(feature_value)
                 if index is not None:
                     matrix[j, index] = 1
-        print(matrix)
+        print(matrix.get_shape())
         # Assign the computed feature_set and matrix to the respective lists
         feature_sets[i] = feature_set
         matrices[i] = matrix
