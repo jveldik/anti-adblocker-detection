@@ -1,6 +1,7 @@
 import csv
 import pickle
 import tensorflow as tf
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 from tensorflow import keras
@@ -20,12 +21,15 @@ def load_data(set_name, number_of_features):
         matrix = pickle.load(f)
     return labels, matrix
 
-# Change set_name and number_of_features as needed
+# Change set_name and k as needed
 set_name = "all"
 number_of_features = 10000
 
 # Load feature matrix and labels
 labels, matrix = load_data(set_name, number_of_features)
+
+# Convert the SciPy sparse matrix to a NumPy array
+matrix = matrix.toarray()
 
 # Split the data into training and testing sets (80% train, 20% test)
 X_train, X_test, y_train, y_test = train_test_split(matrix, labels, test_size=0.2, random_state=42)
