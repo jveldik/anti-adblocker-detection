@@ -11,13 +11,28 @@ from urlextract import URLExtract
 
 NR_TOP_URLS = 5000
 
-def get_nr_visited_urls():
-    if os.path.exists("data/nr_visited_urls.txt"):
-        with open("data/nr_visited_urls.txt", "r") as file:
+def get_last_visited_url():
+    if os.path.exists("data/last_visited_url.txt"):
+        with open("data/last_visited_url.txt", "r") as file:
             content = file.read()
             return int(content)
     else:
         return 0
+    
+def get_urls_to_visit(last_visited_url):
+    visited_count = 0
+    urls = []
+    with open("data/top-1m.csv", "r") as file:
+        reader = csv.reader(file)
+        for i, row in enumerate(reader):
+            if row[1].endswith(".com"):
+                if int(row[0]) <= last_visited_url:
+                    visited_count += 1
+                    continue  # Skip URLs before last_visited_url
+                if len(urls) >= NR_TOP_URLS - visited_count:
+                    break  # Stop adding URLs once the desired length is reached
+                urls.append(row) 
+    return urls
 
 def create_driver():
     # Load the firefox profile with adblocker extension
@@ -106,20 +121,15 @@ def visit_url(driver, session, url):
     except:
         print(f"{url} caused an exception")
   
-nr_visited_urls = get_nr_visited_urls()
+last_visited_url = get_last_visited_url()
 driver = create_driver()
 session = create_session()
-
-# Load the top URLs that have not been stored yet
-with open("data/top-1m.csv", "r") as file:
-    reader = csv.reader(file)
-    urls = [row[1] for i, row in enumerate(reader) if i >= nr_visited_urls and i < NR_TOP_URLS]
-
+urls = get_urls_to_visit(last_visited_url)
 try:
     # Loop over the URLs
     for url in urls:
-        visit_url(driver, session, url)
-        nr_visited_urls += 1
+        visit_url(driver, session, url[1])
+        last_visited_url = url[0]
 except KeyboardInterrupt:
     print("You stopped the script")
 finally:
@@ -127,8 +137,8 @@ finally:
     driver.quit()
 
     # Save number of visited urls
-    with open("data/nr_visited_urls.txt", "w") as file:
-        file.write(str(nr_visited_urls))
+    with open("data/last_visited_url.txt", "w") as file:
+        file.write(str(last_visited_url))
 
     # Print the number of stored urls
     with open("data/stored_urls.txt", 'r') as file:
