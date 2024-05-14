@@ -1,6 +1,6 @@
 import csv
-import multiprocessing
 import os.path
+import re
 from time import sleep
 from bs4 import BeautifulSoup
 import requests
@@ -25,13 +25,12 @@ def get_urls_to_visit(last_visited_url):
     with open("data/top-1m.csv", "r") as file:
         reader = csv.reader(file)
         for i, row in enumerate(reader):
-            if row[1].endswith(".com"):
-                if int(row[0]) <= last_visited_url:
-                    visited_count += 1
-                    continue  # Skip URLs before last_visited_url
-                if len(urls) >= NR_TOP_URLS - visited_count:
-                    break  # Stop adding URLs once the desired length is reached
-                urls.append(row) 
+            if int(row[0]) <= last_visited_url:
+                visited_count += 1
+                continue  # Skip URLs before last_visited_url
+            if len(urls) >= NR_TOP_URLS - visited_count:
+                break  # Stop adding URLs once the desired length is reached
+            urls.append(row)
     return urls
 
 def create_driver():
@@ -84,6 +83,8 @@ def extract_scripts(session, page_source, url):
     script_tags = soup.find_all("script")
     # Create folder for storing scripts
     os.mkdir(f"data/scripts/{url}")
+    with open(f"data/scripts/{url}/source.txt", 'w', encoding='utf-8') as f:
+        f.write(page_source)
     for index, source_tag in enumerate(script_tags):
         source = source_tag.get('src')
         if source:
@@ -91,6 +92,11 @@ def extract_scripts(session, page_source, url):
             save_script(url, index, script_content)
         else:
             save_script(url, index, source_tag.string)
+
+def uses_anti_adblocker(page_source):
+    if re.search(r'\b(ad ?-?_?block)', page_source.lower()):
+        return True
+    return False
 
 def visit_url(driver, session, url):
     try:
@@ -107,15 +113,17 @@ def visit_url(driver, session, url):
         if os.path.exists(f"data/screenshots/{current_url}.png"):
             print(f"{current_url} was already stored")
         else:
-            # Save scripts
             page_source = driver.page_source
-            extract_scripts(session, page_source, current_url)
-            # Save screenshot
-            driver.save_screenshot(f"data/screenshots/{current_url}.png")
-            # Save the current url
-            with open("data/stored_urls.txt", "a", newline='') as file:
-                file.write(f"{current_url}\n")
-            print(f"{current_url} is stored")
+            if uses_anti_adblocker(page_source):
+                print("Anti adblocker found!")
+                # Save scripts
+                extract_scripts(session, page_source, current_url)
+                # Save screenshot
+                driver.save_screenshot(f"data/screenshots/{current_url}.png")
+                # Save the current url
+                with open("data/stored_urls.txt", "a", newline='') as file:
+                    file.write(f"{current_url}\n")
+                print(f"{current_url} is stored")
     except KeyboardInterrupt:
         raise KeyboardInterrupt
     except:
