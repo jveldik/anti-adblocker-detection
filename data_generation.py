@@ -1,6 +1,5 @@
 import csv
 import os.path
-import re
 from time import sleep
 from bs4 import BeautifulSoup
 import requests
@@ -9,8 +8,6 @@ from selenium.webdriver.firefox.options import Options
 from urllib.parse import urlparse
 from urlextract import URLExtract
 
-NR_TOP_URLS = 5000
-
 def get_last_visited_url():
     if os.path.exists("data/last_visited_url.txt"):
         with open("data/last_visited_url.txt", "r") as file:
@@ -18,22 +15,8 @@ def get_last_visited_url():
             return int(content)
     else:
         return 0
-    
-def get_urls_to_visit(last_visited_url):
-    visited_count = 0
-    urls = []
-    with open("data/top-1m.csv", "r") as file:
-        reader = csv.reader(file)
-        for i, row in enumerate(reader):
-            if int(row[0]) <= last_visited_url:
-                visited_count += 1
-                continue  # Skip URLs before last_visited_url
-            if len(urls) >= NR_TOP_URLS - visited_count:
-                break  # Stop adding URLs once the desired length is reached
-            urls.append(row)
-    return urls
 
-def create_driver():
+def create_driver():  
     # Load the firefox profile with adblocker extension
     options = Options()
     options.add_argument('-headless')
@@ -46,7 +29,7 @@ def create_driver():
 
 def create_session():
     session = requests.Session()
-    session.headers.update({'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"})
+    session.headers.update({'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0"})
     return session
 
 def fetch_external_js(session, url, source):
@@ -94,8 +77,28 @@ def extract_scripts(session, page_source, url):
             save_script(url, index, source_tag.string)
 
 def uses_anti_adblocker(page_source):
-    if re.search(r'\b(ad ?-?_?block)', page_source.lower()):
-        return True
+    # List of common phrases and keywords indicating an anti-adblocker message
+    anti_adblock_phrases = [
+        'allow ads', 'ad blocker detected', 'adblock message', 'adblock notice',
+        'adblock popup', 'adblock warning', 'adblocker alert', 'adblocker detected',
+        'ads are how we support', 'disable ad block', 'disable adblock',
+        'disable adblock', 'disable your blocking software',
+        'disable your browser extension', 'disable your extension',
+        'disable your filter', 'enable ads', 'support us by disabling',
+        'support us by turning off', 'turn off adblocker', 'turn off to continue',
+        'turn off your blocker', 'turn off your extension', 'turn off your filter',
+        'we noticed you are using an adblocker', 'whitelist our page',
+        'whitelist our site', 'whitelist this page', 'whitelist us', 'your ad blocker',
+        'your ad filter', 'your adblocker', 'your content blocker'
+    ]
+    
+    # Convert the page source to lowercase to ensure case-insensitive matching
+    page_source_lower = page_source.lower()
+    
+    # Check if any of the anti-adblocker phrases are in the page source
+    for phrase in anti_adblock_phrases:
+        if phrase in page_source_lower:
+            return True
     return False
 
 def visit_url(driver, session, url):
@@ -132,12 +135,15 @@ def visit_url(driver, session, url):
 last_visited_url = get_last_visited_url()
 driver = create_driver()
 session = create_session()
-urls = get_urls_to_visit(last_visited_url)
 try:
-    # Loop over the URLs
-    for url in urls:
-        visit_url(driver, session, url[1])
-        last_visited_url = url[0]
+    visited_count = 0
+    urls = []
+    with open("data/top-1m.csv", "r") as file:
+        reader = csv.reader(file)
+        for i, row in enumerate(reader):
+            if int(row[0]) > last_visited_url and row[1].endswith(".com"):
+                visit_url(driver, session, row[1])
+                last_visited_url = int(row[0])
 except KeyboardInterrupt:
     print("You stopped the script")
 finally:

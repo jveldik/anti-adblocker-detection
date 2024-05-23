@@ -28,15 +28,16 @@ def extract_features_from_AST(node, new_features):
 def extract_features_from_url(url, feature_lists):
     new_features = [[],[],[]]
     for dir in os.listdir(f"data/scripts/{url}"):
-        with open(f"data/scripts/{url}/{dir}", 'r', encoding='utf-8') as f:
-            script = f.read()
-        try:
-            ast = esprima.parseScript(script)
-        except Exception as e:
-            with open('parsing_errors.log', 'a') as error_log:
-                error_log.write(f"Error parsing JavaScript code with {url}/{dir}: {e}\n")
-            continue
-        extract_features_from_AST(getattr(ast, 'body'), new_features)
+        if dir.endswith(".js"):
+            with open(f"data/scripts/{url}/{dir}", 'r', encoding='utf-8') as f:
+                script = f.read()
+            try:
+                ast = esprima.parseScript(script)
+            except Exception as e:
+                with open('parsing_errors.log', 'a') as error_log:
+                    error_log.write(f"Error parsing JavaScript code with {url}/{dir}: {e}\n")
+                continue
+            extract_features_from_AST(getattr(ast, 'body'), new_features)
     for feature_list, url_features in zip(feature_lists, new_features):
         url_features = list(set(url_features))
         feature_list.append(url_features)
