@@ -1,6 +1,10 @@
 import csv
 import os.path
+import pickle
+import re
+import sys
 from time import sleep
+from langid.langid import LanguageIdentifier, model
 from bs4 import BeautifulSoup
 import requests
 from selenium import webdriver
@@ -8,8 +12,8 @@ from selenium.webdriver.firefox.options import Options
 from urllib.parse import urlparse
 from urlextract import URLExtract
 
-def get_last_visited_url():
-    if os.path.exists("data/last_visited_url.txt"):
+def get_last_visited_url(model_name):
+    if os.path.exists(f"data/last_visited_url_{model_name}.txt"):
         with open("data/last_visited_url.txt", "r") as file:
             content = file.read()
             return int(content)
@@ -76,32 +80,52 @@ def extract_scripts(session, page_source, url):
         else:
             save_script(url, index, source_tag.string)
 
-def uses_anti_adblocker(page_source):
-    # List of common phrases and keywords indicating an anti-adblocker message
-    anti_adblock_phrases = [
-        'allow ads', 'ad blocker detected', 'adblock message', 'adblock notice',
-        'adblock popup', 'adblock warning', 'adblocker alert', 'adblocker detected',
-        'ads are how we support', 'disable ad block', 'disable adblock',
-        'disable adblock', 'disable your blocking software',
-        'disable your browser extension', 'disable your extension',
-        'disable your filter', 'enable ads', 'support us by disabling',
-        'support us by turning off', 'turn off adblocker', 'turn off to continue',
-        'turn off your blocker', 'turn off your extension', 'turn off your filter',
-        'we noticed you are using an adblocker', 'whitelist our page',
-        'whitelist our site', 'whitelist this page', 'whitelist us', 'your ad blocker',
-        'your ad filter', 'your adblocker', 'your content blocker'
-    ]
+def extract_features(page_source, feature_set):
     
-    # Convert the page source to lowercase to ensure case-insensitive matching
-    page_source_lower = page_source.lower()
-    
-    # Check if any of the anti-adblocker phrases are in the page source
-    for phrase in anti_adblock_phrases:
-        if phrase in page_source_lower:
-            return True
-    return False
+    return []
 
-def visit_url(driver, session, url):
+def uses_anti_adblocker(page_source, model_name):
+    if model_name == "keywords":
+        # List of common phrases and keywords indicating an anti-adblocker message
+        anti_adblock_phrases = [
+            'allow ads', 'ad blocker detected', 'adblock message', 'adblock notice',
+            'adblock popup', 'adblock warning', 'adblocker alert', 'adblocker detected',
+            'ads are how we support', 'disable ad block', 'disable adblock',
+            'disable adblock', 'disable your blocking software',
+            'disable your browser extension', 'disable your extension',
+            'disable your filter', 'enable ads', 'support us by disabling',
+            'support us by turning off', 'turn off adblocker', 'turn off to continue',
+            'turn off your blocker', 'turn off your extension', 'turn off your filter',
+            'we noticed you are using an adblocker', 'whitelist our page',
+            'whitelist our site', 'whitelist this page', 'whitelist us', 'your ad blocker',
+            'your ad filter', 'your adblocker', 'your content blocker'
+        ]
+        
+        # Convert the page source to lowercase to ensure case-insensitive matching
+        page_source_lower = page_source.lower()
+        
+        # Check if any of the anti-adblocker phrases are in the page source
+        for phrase in anti_adblock_phrases:
+            if phrase in page_source_lower:
+                return True
+        return False
+    else:
+        feature_set = pickle.load(f"all_10000.pickle")
+        features = extract_features(page_source, feature_set)
+        model = pickle.load(f"models/model_name.pickle")
+        return model.predict(features)
+
+def no_anti_adblocker(page_source):
+    if re.search(r'\b(ad ?-?_?block)', page_source.lower()):
+        return False
+    return True
+
+def is_english(page_source):
+    identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
+    lang, prob = identifier.classify(page_source)
+    return lang == 'en'
+
+def visit_url(driver, session, url, model_name, counterexamples_needed):
     try:
         print(f"Visiting {url}")
         # Use Selenium to load the URL
@@ -112,49 +136,91 @@ def visit_url(driver, session, url):
         sleep(5)
         
         current_url = urlparse(driver.current_url).netloc
-        # Check if current url is already visited
-        if os.path.exists(f"data/screenshots/{current_url}.png"):
-            print(f"{current_url} was already stored")
-        else:
-            page_source = driver.page_source
-            if uses_anti_adblocker(page_source):
+        page_source = driver.page_source
+
+        if is_english(page_source):
+            if uses_anti_adblocker(page_source, model_name):
                 print("Anti adblocker found!")
-                # Save scripts
-                extract_scripts(session, page_source, current_url)
-                # Save screenshot
-                driver.save_screenshot(f"data/screenshots/{current_url}.png")
+                # Check if current url is already stored
+                if os.path.exists(f"data/screenshots/{current_url}.png"):
+                    print(f"{current_url} was already stored")
+                else:
+                    # Save scripts
+                    extract_scripts(session, page_source, current_url)
+                    # Save screenshot
+                    driver.save_screenshot(f"data/screenshots/{current_url}.png")
+                    print(f"{current_url} is stored")
                 # Save the current url
-                with open("data/stored_urls.txt", "a", newline='') as file:
-                    file.write(f"{current_url}\n")
-                print(f"{current_url} is stored")
+                with open(f"data/stored_urls_{model_name}.txt", "a", newline='') as file:
+                    file.write(f"{current_url}, True\n")
+                counterexamples_needed += 1
+            if counterexamples_needed > 0 and no_anti_adblocker(page_source):
+                print("No anti adblocker found!")
+                # Check if current url is already stored
+                if os.path.exists(f"data/screenshots/{current_url}.png"):
+                    print(f"{current_url} was already stored")
+                else:
+                    # Save scripts
+                    extract_scripts(session, page_source, current_url)
+                    # Save screenshot
+                    driver.save_screenshot(f"data/screenshots/{current_url}.png")
+                    print(f"{current_url} is stored")
+                # Save the current url
+                with open(f"data/stored_urls_{model_name}.txt", "a", newline='') as file:
+                    file.write(f"{current_url}, False\n")
     except KeyboardInterrupt:
         raise KeyboardInterrupt
     except:
         print(f"{url} caused an exception")
-  
-last_visited_url = get_last_visited_url()
-driver = create_driver()
-session = create_session()
-try:
-    visited_count = 0
-    urls = []
-    with open("data/top-1m.csv", "r") as file:
-        reader = csv.reader(file)
-        for i, row in enumerate(reader):
-            if int(row[0]) > last_visited_url and row[1].endswith(".com"):
-                visit_url(driver, session, row[1])
-                last_visited_url = int(row[0])
-except KeyboardInterrupt:
-    print("You stopped the script")
-finally:
-    # Quit the selenium instance
-    driver.quit()
 
-    # Save number of visited urls
-    with open("data/last_visited_url.txt", "w") as file:
-        file.write(str(last_visited_url))
+if __name__ == "__main__":
+    n = len(sys.argv)
+    if n > 0:
+        num_urls = sys.argv[1]
+    if n == 1:
+        model_name = "keywords"
+    elif n == 2:
+        model_name = sys.argv[2]
+    else:
+        print("The first argument should be the number of urls you want to search")
+        print("(Optional) The second argument is the name of the model, you want to use to classify the urls")
+        exit()
 
-    # Print the number of stored urls
-    with open("data/stored_urls.txt", 'r') as file:
-        nr_stored_urls = sum(1 for line in file if line.strip())
+    last_visited_url = get_last_visited_url(model_name)
+    driver = create_driver()
+    session = create_session()
+    try:
+        counterexamples_needed = 0
+        urls = []
+        with open("data/top-1m.csv", "r") as file:
+            reader = csv.reader(file)
+            for i, row in enumerate(reader):
+                if int(row[0]) > num_urls:
+                    break
+                if int(row[0]) > last_visited_url:
+                    visit_url(driver, session, row[1], counterexamples_needed)
+                    last_visited_url = int(row[0])
+    except KeyboardInterrupt:
+        print("You stopped the script")
+    finally:
+        # Quit the selenium instance
+        driver.quit()
+
+        # Save number of visited urls
+        with open(f"data/last_visited_url_{model_name}.txt", "w") as file:
+            file.write(str(last_visited_url))
+
+        # Remove duplicate urls
+        url_set = set()
+        with open(f"data/stored_urls_{model_name}.txt", 'r') as file:
+            for line in file:
+                url = line.strip()
+                if url:
+                    url_set.add(url)
+        with open(f"data/stored_urls_{model_name}.txt", 'w') as file:
+            for url in url_set:
+                file.write(url + '\n')
+
+        # Print the number of unique stored urls
+        nr_stored_urls = len(url_set)
         print(f"{nr_stored_urls} urls are stored")
