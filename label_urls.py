@@ -36,8 +36,8 @@ def get_label(url, original_label, root):
     image_label.pack()
 
     def save_and_next_label(response_label):
-        if original_label == "True" and response_label == "False":
-            response_label = None  
+        if original_label == "True" and response_label == False:
+            response_label = None
         save_label(url, response_label)
         frame.destroy()
         process_urls(rows, root)
