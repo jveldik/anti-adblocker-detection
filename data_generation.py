@@ -19,7 +19,7 @@ def get_last_visited_url():
     else:
         return 0
 
-def create_driver():  
+def create_driver():
     # Load the firefox profile with adblocker extension
     options = Options()
     options.add_argument('-headless')
@@ -140,17 +140,19 @@ def visit_url(driver, session, url, visited_count, counterexamples_needed):
                 if uses_anti_adblocker(page_source):
                     print(f"{current_url} uses an anti adblocker phrase!")
                     # Save the current url
-                    with open(f"data/stored_urls.txt", "a", newline='') as file:
-                        file.write(f"{current_url}, True\n")
+                    with open("data/stored_urls.csv", "a", newline='') as file:
+                        writer = csv.writer(file)
+                        writer.writerow([current_url, True])
                     counterexamples_needed += 1
                 elif counterexamples_needed > 0 and no_anti_adblocker(page_source):
                     print(f"{current_url} does not contain anti adblocker words!")
                     # Save the current url
-                    with open("data/stored_urls.txt", "a", newline='') as file:
-                        file.write(f"{current_url}, False\n")
+                    with open("data/stored_urls.csv", "a", newline='') as file:
+                        writer = csv.writer(file)
+                        writer.writerow([current_url, False])
                     counterexamples_needed -= 1
             else:
-                print(f"{current_url} is not an english website")
+                print(f"{current_url} is not an English website")
     except KeyboardInterrupt:
         raise KeyboardInterrupt
     except:
@@ -158,8 +160,7 @@ def visit_url(driver, session, url, visited_count, counterexamples_needed):
     return visited_count, counterexamples_needed
 
 if __name__ == "__main__":
-    n = len(sys.argv)
-    if n == 2:
+    if len(sys.argv) == 2:
         num_urls = int(sys.argv[1])
     else:
         print("The first argument should be the number of urls you want to store")
@@ -170,8 +171,8 @@ if __name__ == "__main__":
     session = create_session()
     visited_count = len(os.listdir("data/screenshots")) - 1
     counterexamples_needed = 0
+
     try:
-        urls = []
         with open("data/top-1m.csv", "r") as file:
             reader = csv.reader(file)
             for i, row in enumerate(reader):
@@ -191,6 +192,6 @@ if __name__ == "__main__":
             file.write(str(last_visited_url))
 
         # Print the number of urls with indication
-        with open("data/stored_urls.txt", 'r') as file:
+        with open("data/stored_urls.csv", 'r') as file:
             nr_stored_urls = sum(1 for line in file if line.strip())
             print(f"From the {visited_count} urls stored, {nr_stored_urls} urls have been given an indication on using an anti adblocker")
