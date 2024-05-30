@@ -179,7 +179,7 @@ if __name__ == "__main__":
                 if int(row[0]) > last_visited_url:
                     visited_count, counterexamples_needed = visit_url(driver, session, row[1], visited_count, counterexamples_needed)
                     last_visited_url = int(row[0])
-                    if visited_count > num_urls:
+                    if visited_count >= num_urls:
                         break
     except KeyboardInterrupt:
         print("You stopped the script")

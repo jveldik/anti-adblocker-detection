@@ -1,8 +1,9 @@
 import csv
 import pickle
+import numpy as np
 from sklearn import svm
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import StratifiedKFold, cross_val_score, cross_val_predict
+from sklearn.metrics import classification_report
 from sklearn.utils.class_weight import compute_class_weight
 
 # Load the saved matrices and feature sets
@@ -21,30 +22,32 @@ def load_data(set_name, number_of_features):
 
 # Change set_name and number_of_features as needed
 set_name = "all"
-number_of_features = 10000
+number_of_features = 1000
 
 # Load feature matrix and labels
 labels, matrix = load_data(set_name, number_of_features)
 
-# Split the data into training and testing sets (80% train, 20% test)
-X_train, X_test, y_train, y_test = train_test_split(matrix, labels, test_size=0.2)
+# Convert labels to a numpy array
+labels = np.array(labels)
 
 # Compute class weights
-class_weights = compute_class_weight('balanced', classes=[False, True], y=y_train)
+class_weights = compute_class_weight('balanced', classes=[False, True], y=labels)
+class_weight_dict = {False: class_weights[0], True: class_weights[1]}
 
 # Initialize the SVM classifier with class weights
-clf = svm.SVC(class_weight={False: class_weights[0], True: class_weights[1]})
+clf = svm.SVC(class_weight=class_weight_dict)
 
-# Train the classifier on the training data
-clf.fit(X_train, y_train)
+# Perform stratified k-fold cross-validation
+skf = StratifiedKFold(n_splits=5)
+cross_val_scores = cross_val_score(clf, matrix, labels, cv=skf, scoring='accuracy')
 
-# Make predictions on the test data
-y_pred = clf.predict(X_test)
+print("Cross-validation accuracy scores:", cross_val_scores)
+print("Mean cross-validation accuracy:", np.mean(cross_val_scores))
 
-# Calculate accuracy
-accuracy = accuracy_score(y_test, y_pred)
-print("Accuracy:", accuracy)
+# Train the classifier on the entire dataset
+clf.fit(matrix, labels)
 
-# Generate a classification report
-classification_rep = classification_report(y_test, y_pred)
+# Generate a classification report using cross-validation
+y_pred = cross_val_predict(clf, matrix, labels, cv=skf)
+classification_rep = classification_report(labels, y_pred)
 print("Classification Report:\n", classification_rep)
