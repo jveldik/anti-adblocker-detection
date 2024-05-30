@@ -21,7 +21,7 @@ def load_data(set_name, number_of_features):
     return labels, matrix
 
 # Change set_name and number_of_features as needed
-set_name = "all"
+set_name = "identifier"
 number_of_features = 1000
 
 # Load feature matrix and labels
@@ -51,3 +51,8 @@ clf.fit(matrix, labels)
 y_pred = cross_val_predict(clf, matrix, labels, cv=skf)
 classification_rep = classification_report(labels, y_pred)
 print("Classification Report:\n", classification_rep)
+
+# Save the model
+modelname = "svm_initial"
+with open(f"data/models/{modelname}_{set_name}_{number_of_features}.pickle", 'wb') as f:
+    pickle.dump(clf, f)

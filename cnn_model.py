@@ -24,7 +24,7 @@ def load_data(set_name, number_of_features):
 
 # Change set_name and number_of_features as needed
 set_name = "all"
-number_of_features = 10000
+number_of_features = 1000
 
 # Load feature matrix and labels
 labels, matrix = load_data(set_name, number_of_features)
@@ -73,3 +73,8 @@ for train_index, test_index in skf.split(matrix, np.argmax(labels, axis=1)):
 y_true = np.argmax(labels, axis=1)
 classification_rep = classification_report(y_true, cross_val_predictions)
 print("Classification Report:\n", classification_rep)
+
+# Save the model
+modelname = "cnn_initial"
+with open(f"data/models/{modelname}_{set_name}_{number_of_features}.pickle", 'wb') as f:
+    pickle.dump(model, f)
