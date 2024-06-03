@@ -20,39 +20,40 @@ def load_data(set_name, number_of_features):
         matrix = pickle.load(f)
     return labels, matrix
 
-# Change set_name and number_of_features as needed
-set_name = "identifier"
-number_of_features = 1000
+if __name__ == "__main__":
+    # Change set_name and number_of_features as needed
+    set_name = "identifier"
+    number_of_features = 1000
 
-# Load feature matrix and labels
-labels, matrix = load_data(set_name, number_of_features)
+    # Load feature matrix and labels
+    labels, matrix = load_data(set_name, number_of_features)
 
-# Convert labels to a numpy array
-labels = np.array(labels)
+    # Convert labels to a numpy array
+    labels = np.array(labels)
 
-# Compute class weights
-class_weights = compute_class_weight('balanced', classes=[False, True], y=labels)
-class_weight_dict = {False: class_weights[0], True: class_weights[1]}
+    # Compute class weights
+    class_weights = compute_class_weight('balanced', classes=[False, True], y=labels)
+    class_weight_dict = {False: class_weights[0], True: class_weights[1]}
 
-# Initialize the SVM classifier with class weights
-clf = svm.SVC(class_weight=class_weight_dict)
+    # Initialize the SVM classifier with class weights
+    clf = svm.SVC(class_weight=class_weight_dict)
 
-# Perform stratified k-fold cross-validation
-skf = StratifiedKFold(n_splits=5)
-cross_val_scores = cross_val_score(clf, matrix, labels, cv=skf, scoring='accuracy')
+    # Perform stratified k-fold cross-validation
+    skf = StratifiedKFold(n_splits=5)
+    cross_val_scores = cross_val_score(clf, matrix, labels, cv=skf, scoring='accuracy')
 
-print("Cross-validation accuracy scores:", cross_val_scores)
-print("Mean cross-validation accuracy:", np.mean(cross_val_scores))
+    print("Cross-validation accuracy scores:", cross_val_scores)
+    print("Mean cross-validation accuracy:", np.mean(cross_val_scores))
 
-# Train the classifier on the entire dataset
-clf.fit(matrix, labels)
+    # Train the classifier on the entire dataset
+    clf.fit(matrix, labels)
 
-# Generate a classification report using cross-validation
-y_pred = cross_val_predict(clf, matrix, labels, cv=skf)
-classification_rep = classification_report(labels, y_pred)
-print("Classification Report:\n", classification_rep)
+    # Generate a classification report using cross-validation
+    y_pred = cross_val_predict(clf, matrix, labels, cv=skf)
+    classification_rep = classification_report(labels, y_pred)
+    print("Classification Report:\n", classification_rep)
 
-# Save the model
-modelname = "svm_initial"
-with open(f"data/models/{modelname}_{set_name}_{number_of_features}.pickle", 'wb') as f:
-    pickle.dump(clf, f)
+    # Save the model
+    modelname = "svm_initial"
+    with open(f"data/models/{modelname}_{set_name}_{number_of_features}.pickle", 'wb') as f:
+        pickle.dump(clf, f)

@@ -64,13 +64,14 @@ def process_urls(rows, root):
         url, original_label = rows.pop(0)
         get_label(url, original_label, root)
 
-root = tk.Tk()
-root.focus_set()
-rows = get_urls_to_label()
-process_urls(rows, root)
-root.eval('tk::PlaceWindow . center')
-root.mainloop()
+if __name__ == "__main__":
+    root = tk.Tk()
+    root.focus_set()
+    rows = get_urls_to_label()
+    process_urls(rows, root)
+    root.eval('tk::PlaceWindow . center')
+    root.mainloop()
 
-with open("data/labeled_urls.csv", "r") as file:
-    nr_labeled_urls = sum(1 for line in file)
-print(f"You have labeled {nr_labeled_urls} urls.")
+    with open("data/labeled_urls.csv", "r") as file:
+        nr_labeled_urls = sum(1 for line in file)
+    print(f"You have labeled {nr_labeled_urls} urls.")

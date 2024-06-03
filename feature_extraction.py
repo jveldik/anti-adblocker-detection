@@ -113,6 +113,7 @@ def filter_matrices(matrices, feature_sets, labels):
             print("Saving data")
             save_data(matrix, feature_set, i, k)
 
-feature_lists, labels = extract_features()
-feature_sets, matrices = create_matrices(feature_lists)
-filter_matrices(matrices, feature_sets, labels)
+if __name__ == "__main__":
+    feature_lists, labels = extract_features()
+    feature_sets, matrices = create_matrices(feature_lists)
+    filter_matrices(matrices, feature_sets, labels)
