@@ -6,20 +6,19 @@ from scipy.sparse import lil_matrix
 from feature_extraction import extract_features_from_url
 
 # Function to create a sparse row vector from feature lists
-def create_sparse_row(feature_lists, feature_set, set_name):
+def create_sparse_row(feature_lists, feature_dict, set_name):
     if set_name == "all":
-        relevant_features = feature_lists[0]
+        relevant_features = list(set(feature_lists[0][0]))
     elif set_name == "literal":
-        relevant_features = feature_lists[1]
+        relevant_features = list(set(feature_lists[1][0]))
     elif set_name == "identifier":
-        relevant_features = feature_lists[2]
-    
-    feature_vector = lil_matrix((1, len(feature_set)), dtype=bool)
+        relevant_features = list(set(feature_lists[2][0]))
+
+    feature_vector = lil_matrix((1, len(feature_dict)), dtype=bool)
     for feature in relevant_features:
-        if feature in feature_set:
-            index = feature_set.index(feature)
+        if feature in feature_dict:
+            index = feature_dict[feature]
             feature_vector[0, index] = 1
-    
     return feature_vector
 
 # Function to save the prediction results
@@ -43,6 +42,9 @@ if __name__ == "__main__":
     with open(f"data/feature_sets/{set_name}_{number_of_features}.pickle", 'rb') as f:
         feature_set = pickle.load(f)
 
+    # Convert feature_set to a dictionary for fast lookup
+    feature_dict = {feature: idx for idx, feature in enumerate(feature_set)}
+
     urls = []
     features_list = []
 
@@ -53,11 +55,11 @@ if __name__ == "__main__":
         urls.append(url)
         feature_lists = [[], [], []]
         extract_features_from_url(url, feature_lists)
-        sparse_row = create_sparse_row(feature_lists, feature_set, set_name)
+        sparse_row = create_sparse_row(feature_lists, feature_dict, set_name)
         features_list.append(sparse_row)
 
     # Convert features_list to a single sparse matrix
-    features_matrix = lil_matrix((len(features_list), len(feature_set)), dtype=bool)
+    features_matrix = lil_matrix((len(features_list), len(feature_dict)), dtype=bool)
     for i, sparse_row in enumerate(features_list):
         features_matrix[i] = sparse_row
 
