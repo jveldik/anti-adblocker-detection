@@ -8,9 +8,9 @@ from sklearn.metrics import classification_report
 from sklearn.utils.class_weight import compute_class_weight
 
 # Load the saved matrices and feature sets
-def load_data(set_name, number_of_features):
+def load_data(filename, set_name, number_of_features):
     labels = []
-    with open("data/labeled_urls.csv", mode='r') as file:
+    with open(f"data/{filename}", mode='r') as file:
         reader = csv.reader(file)
         for row in reader:
             if row[1] == "True":
@@ -22,18 +22,20 @@ def load_data(set_name, number_of_features):
     return labels, matrix
 
 if __name__ == "__main__":
-    if len(sys.argv) == 4:
-        modelname = sys.argv[1]
-        set_name = sys.argv[1]
-        number_of_features = sys.argv[1]
+    if len(sys.argv) == 5:
+        filename = sys.argv[1]
+        modelname = sys.argv[2]
+        set_name = sys.argv[3]
+        number_of_features = sys.argv[4]
     else:
-        print("The first argument should be the modelname")
-        print("The second argument should be the set name")
-        print("The third argument should be the number of features")
+        print("The first argument should be the filename")
+        print("The second argument should be the modelname")
+        print("The third argument should be the set name")
+        print("The fourth argument should be the number of features")
         exit()
 
     # Load feature matrix and labels
-    labels, matrix = load_data(set_name, number_of_features)
+    labels, matrix = load_data(filename, set_name, number_of_features)
 
     # Convert labels to a numpy array
     labels = np.array(labels)

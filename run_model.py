@@ -2,7 +2,6 @@ import os
 import pickle
 import csv
 import sys
-import numpy as np
 from scipy.sparse import lil_matrix
 from feature_extraction import extract_features_from_url
 
@@ -32,8 +31,8 @@ def save_results(urls, labels, modelname, set_name, number_of_features):
 if __name__ == "__main__":
     if len(sys.argv) == 4:
         modelname = sys.argv[1]
-        set_name = sys.argv[1]
-        number_of_features = sys.argv[1]
+        set_name = sys.argv[2]
+        number_of_features = sys.argv[3]
     else:
         print("The first argument should be the modelname")
         print("The second argument should be the set name")

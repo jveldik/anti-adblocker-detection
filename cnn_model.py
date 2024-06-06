@@ -1,5 +1,6 @@
 import csv
 import pickle
+import sys
 import numpy as np
 from sklearn.model_selection import StratifiedKFold, cross_val_predict
 from sklearn.metrics import classification_report
@@ -9,9 +10,9 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Conv1D, GlobalMaxPooling1D
 
 # Load the saved matrices and feature sets
-def load_data(set_name, number_of_features):
+def load_data(filename, set_name, number_of_features):
     labels = []
-    with open("data/labeled_urls.csv", mode='r') as file:
+    with open(f"data/{filename}", mode='r') as file:
         reader = csv.reader(file)
         for row in reader:
             if row[1] == "True":
@@ -23,12 +24,20 @@ def load_data(set_name, number_of_features):
     return labels, matrix
 
 if __name__ == "__main__":
-    # Change set_name and number_of_features as needed
-    set_name = "all"
-    number_of_features = 1000
+    if len(sys.argv) == 5:
+        filename = sys.argv[1]
+        modelname = sys.argv[2]
+        set_name = sys.argv[3]
+        number_of_features = int(sys.argv[4])
+    else:
+        print("The first argument should be the filename")
+        print("The second argument should be the modelname")
+        print("The third argument should be the set name")
+        print("The fourth argument should be the number of features")
+        exit()
 
     # Load feature matrix and labels
-    labels, matrix = load_data(set_name, number_of_features)
+    labels, matrix = load_data(filename, set_name, number_of_features)
     labels = np.array(labels)
 
     # Convert sparse matrix to dense matrix
@@ -76,6 +85,5 @@ if __name__ == "__main__":
     print("Classification Report:\n", classification_rep)
 
     # Save the model
-    modelname = "cnn_initial"
     with open(f"data/models/{modelname}_{set_name}_{number_of_features}.pickle", 'wb') as f:
         pickle.dump(model, f)
