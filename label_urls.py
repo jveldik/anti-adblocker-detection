@@ -1,23 +1,24 @@
 import csv
 import os.path
+import sys
 import tkinter as tk
 from tkinter import Frame, Button, LEFT
 from PIL import Image, ImageTk
 
-def get_urls_to_label():
+def get_urls_to_label(filename):
     # Check if there are already some urls labeled
-    if os.path.exists("data/labeled_urls.csv"):
-        with open("data/labeled_urls.csv", mode = 'r', newline = '') as file:
+    if os.path.exists(f"data/manual_{filename}"):
+        with open(f"data/manual_{filename}", mode = 'r', newline = '') as file:
             nr_labeled_urls = sum(1 for line in file)
     else:
         nr_labeled_urls = 0
     # Read the stored URLs, starting after the last labeled url
-    with open("data/stored_urls.csv", mode='r', newline='') as file:
+    with open(f"data/{filename}", mode='r', newline='') as file:
         reader = csv.reader(file)
         return [(row[0], row[1]) for i, row in enumerate(reader) if i >= nr_labeled_urls]
     
 def save_label(url, label):
-    with open("data/labeled_urls.csv", "a", newline='') as file:
+    with open(f"data/manual_{filename}", "a", newline='') as file:
         writer = csv.writer(file)
         writer.writerow([url, label])
 
@@ -65,13 +66,19 @@ def process_urls(rows, root):
         get_label(url, original_label, root)
 
 if __name__ == "__main__":
+    if len(sys.argv) == 2:
+        filename = sys.argv[1]
+    else:
+        print("The first argument should be the filename of the csv file with urls you want to label")
+        exit()
+
     root = tk.Tk()
     root.focus_set()
-    rows = get_urls_to_label()
+    rows = get_urls_to_label(filename)
     process_urls(rows, root)
     root.eval('tk::PlaceWindow . center')
     root.mainloop()
 
-    with open("data/labeled_urls.csv", "r") as file:
+    with open(f"data/manual_{filename}", "r") as file:
         nr_labeled_urls = sum(1 for line in file)
     print(f"You have labeled {nr_labeled_urls} urls.")
