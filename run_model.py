@@ -30,7 +30,7 @@ def save_results(urls, labels, modelname, set_name, number_of_features):
             writer.writerow([url, label])
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
+    if len(sys.argv) == 4:
         modelname = sys.argv[1]
         set_name = sys.argv[1]
         number_of_features = sys.argv[1]
