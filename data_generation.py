@@ -140,14 +140,14 @@ def visit_url(driver, session, url, visited_count, counterexamples_needed):
                 if uses_anti_adblocker(page_source):
                     print(f"{current_url} uses an anti adblocker phrase!")
                     # Save the current url
-                    with open("data/stored_urls.csv", "a", newline='') as file:
+                    with open("data/keyword_labeled_urls.csv", "a", newline='') as file:
                         writer = csv.writer(file)
                         writer.writerow([current_url, True])
                     counterexamples_needed += 1
                 elif counterexamples_needed > 0 and no_anti_adblocker(page_source):
                     print(f"{current_url} does not contain anti adblocker words!")
                     # Save the current url
-                    with open("data/stored_urls.csv", "a", newline='') as file:
+                    with open("data/keyword_labeled_urls.csv", "a", newline='') as file:
                         writer = csv.writer(file)
                         writer.writerow([current_url, False])
                     counterexamples_needed -= 1
@@ -192,6 +192,6 @@ if __name__ == "__main__":
             file.write(str(last_visited_url))
 
         # Print the number of urls with indication
-        with open("data/stored_urls.csv", 'r') as file:
-            nr_stored_urls = sum(1 for line in file if line.strip())
-            print(f"From the {visited_count} urls stored, {nr_stored_urls} urls have been given an indication on using an anti adblocker")
+        with open("data/keyword_labeled_urls.csv", 'r') as file:
+            nr_labeled_urls = sum(1 for line in file if line.strip())
+            print(f"From the {visited_count} urls stored, {nr_labeled_urls} urls have been given an indication on using an anti adblocker")
