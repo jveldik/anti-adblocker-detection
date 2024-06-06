@@ -6,16 +6,22 @@ from tkinter import Frame, Button, LEFT
 from PIL import Image, ImageTk
 
 def get_urls_to_label(filename):
-    # Check if there are already some urls labeled
+    # Check if there are already some URLs labeled
     if os.path.exists(f"data/manual_{filename}"):
-        with open(f"data/manual_{filename}", mode = 'r', newline = '') as file:
+        with open(f"data/manual_{filename}", mode='r', newline='') as file:
             nr_labeled_urls = sum(1 for line in file)
     else:
         nr_labeled_urls = 0
-    # Read the stored URLs, starting after the last labeled url
+    # Read the stored URLs, starting after the last labeled URL
     with open(f"data/{filename}", mode='r', newline='') as file:
         reader = csv.reader(file)
-        return [(row[0], row[1]) for i, row in enumerate(reader) if i >= nr_labeled_urls]
+        urls = [(row[0], row[1]) for i, row in enumerate(reader) if i >= nr_labeled_urls]
+    # Split the URLs into true and false and interleave them
+    true_urls = [url for url in urls if url[1] == 'True']
+    false_urls = [url for url in urls if url[1] == 'False']
+    min_len = min(len(true_urls), len(false_urls))
+    interleaved_urls = [val for pair in zip(true_urls[:min_len], false_urls[:min_len]) for val in pair]
+    return interleaved_urls
     
 def save_label(url, label):
     with open(f"data/manual_{filename}", "a", newline='') as file:

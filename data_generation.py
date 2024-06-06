@@ -114,7 +114,7 @@ def is_english(page_source):
     lang, prob = identifier.classify(page_source)
     return lang == 'en'
 
-def visit_url(driver, session, url, visited_count, counterexamples_needed):
+def visit_url(driver, session, url, visited_count):
     try:
         print(f"Visiting {url}")
         # Use Selenium to load the URL
@@ -139,18 +139,16 @@ def visit_url(driver, session, url, visited_count, counterexamples_needed):
                 visited_count += 1
                 if uses_anti_adblocker(page_source):
                     print(f"{current_url} uses an anti adblocker phrase!")
-                    # Save the current url
-                    with open("data/keyword_labeled_urls.csv", "a", newline='') as file:
-                        writer = csv.writer(file)
-                        writer.writerow([current_url, True])
-                    counterexamples_needed += 1
-                elif counterexamples_needed > 0 and no_anti_adblocker(page_source):
+                    label = True
+                elif no_anti_adblocker(page_source):
                     print(f"{current_url} does not contain anti adblocker words!")
-                    # Save the current url
-                    with open("data/keyword_labeled_urls.csv", "a", newline='') as file:
-                        writer = csv.writer(file)
-                        writer.writerow([current_url, False])
-                    counterexamples_needed -= 1
+                    label = False
+                else:
+                    label = None
+                # Save the current url
+                with open("data/keyword_labeled_urls.csv", "a", newline='') as file:
+                    writer = csv.writer(file)
+                    writer.writerow([current_url, label])
             else:
                 print(f"{current_url} is not an English website")
     except KeyboardInterrupt:
