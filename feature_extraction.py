@@ -1,6 +1,7 @@
 import csv
 import os
 import pickle
+import sys
 import esprima
 from scipy.sparse import lil_matrix
 from sklearn.feature_selection import chi2, SelectKBest, VarianceThreshold
@@ -43,10 +44,10 @@ def extract_features_from_url(url, feature_lists):
         feature_list.append(url_features)
     print(f"Extracted features from {url}")
 
-def extract_features():
+def extract_features(filename):
     feature_lists = [[], [], []]
     labels = []
-    with open("data/labeled_urls.csv", mode = 'r') as file:
+    with open(f"data/{filename}", mode = 'r') as file:
         reader = csv.reader(file)
         for row in reader:
             if row[1] == "True":
@@ -114,6 +115,11 @@ def filter_matrices(matrices, feature_sets, labels):
             save_data(matrix, feature_set, i, k)
 
 if __name__ == "__main__":
-    feature_lists, labels = extract_features()
+    if len(sys.argv) == 2:
+        filename = sys.argv[1]
+    else:
+        print("The first argument should be the filename of the csv file with urls you want to create feature sets from")
+        exit()
+    feature_lists, labels = extract_features(filename)
     feature_sets, matrices = create_matrices(feature_lists)
     filter_matrices(matrices, feature_sets, labels)
