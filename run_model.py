@@ -1,6 +1,7 @@
 import os
 import pickle
 import csv
+import sys
 import numpy as np
 from scipy.sparse import lil_matrix
 from feature_extraction import extract_features_from_url
@@ -29,10 +30,15 @@ def save_results(urls, labels, modelname, set_name, number_of_features):
             writer.writerow([url, label])
 
 if __name__ == "__main__":
-    # Change model_name, set_name and number_of_features as needed
-    modelname = "svm_initial"
-    set_name = "identifier"
-    number_of_features = 1000
+    if len(sys.argv) == 2:
+        modelname = sys.argv[1]
+        set_name = sys.argv[1]
+        number_of_features = sys.argv[1]
+    else:
+        print("The first argument should be the modelname")
+        print("The second argument should be the set name")
+        print("The third argument should be the number of features")
+        exit()
 
     # Load the model to predict the labels
     with open(f"data/models/{modelname}_{set_name}_{number_of_features}.pickle", 'rb') as f:

@@ -1,5 +1,6 @@
 import csv
 import pickle
+import sys
 import numpy as np
 from sklearn import svm
 from sklearn.model_selection import StratifiedKFold, cross_val_score, cross_val_predict
@@ -21,9 +22,15 @@ def load_data(set_name, number_of_features):
     return labels, matrix
 
 if __name__ == "__main__":
-    # Change set_name and number_of_features as needed
-    set_name = "identifier"
-    number_of_features = 1000
+    if len(sys.argv) == 2:
+        modelname = sys.argv[1]
+        set_name = sys.argv[1]
+        number_of_features = sys.argv[1]
+    else:
+        print("The first argument should be the modelname")
+        print("The second argument should be the set name")
+        print("The third argument should be the number of features")
+        exit()
 
     # Load feature matrix and labels
     labels, matrix = load_data(set_name, number_of_features)
@@ -54,6 +61,5 @@ if __name__ == "__main__":
     print("Classification Report:\n", classification_rep)
 
     # Save the model
-    modelname = "svm_initial"
     with open(f"data/models/{modelname}_{set_name}_{number_of_features}.pickle", 'wb') as f:
         pickle.dump(clf, f)
