@@ -122,7 +122,7 @@ def visit_url(driver, session, url, visited_count):
         # Wait for the page to load
         while driver.execute_script("return document.readyState") != "complete":
             sleep(1)
-        sleep(10)
+        sleep(15)
         current_url = urlparse(driver.current_url).netloc
 
         # Check if current url is already stored
@@ -155,7 +155,7 @@ def visit_url(driver, session, url, visited_count):
         raise KeyboardInterrupt
     except:
         print(f"{url} caused an exception")
-    return visited_count, counterexamples_needed
+    return visited_count
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
@@ -168,14 +168,13 @@ if __name__ == "__main__":
     driver = create_driver()
     session = create_session()
     visited_count = len(os.listdir("data/screenshots")) - 1
-    counterexamples_needed = 0
-
+    
     try:
         with open("data/top-1m.csv", "r") as file:
             reader = csv.reader(file)
             for i, row in enumerate(reader):
                 if int(row[0]) > last_visited_url:
-                    visited_count, counterexamples_needed = visit_url(driver, session, row[1], visited_count, counterexamples_needed)
+                    visited_count = visit_url(driver, session, row[1], visited_count)
                     last_visited_url = int(row[0])
                     if visited_count >= num_urls:
                         break
