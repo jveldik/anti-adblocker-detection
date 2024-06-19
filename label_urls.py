@@ -73,11 +73,10 @@ def process_urls(rows, root):
         get_label(url, original_label, root)
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        filename = sys.argv[1]
-    else:
-        print("The first argument should be the filename of the csv file with urls you want to label")
+    if len(sys.argv) != 2:
+        print("Usage: label_urls.py <filename>")
         exit()
+    filename = sys.argv[1]
 
     root = tk.Tk()
     root.focus_set()

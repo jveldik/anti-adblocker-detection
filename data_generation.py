@@ -159,11 +159,10 @@ def visit_url(driver, session, url, visited_count):
     return visited_count
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        num_urls = int(sys.argv[1])
-    else:
-        print("The first argument should be the number of urls you want to store")
+    if len(sys.argv) != 2:
+        print("Usage: data_generation.py <num_urls>")
         exit()
+    num_urls = int(sys.argv[1])
 
     last_visited_url = get_last_visited_url()
     driver = create_driver()

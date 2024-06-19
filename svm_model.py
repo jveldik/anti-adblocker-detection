@@ -22,17 +22,13 @@ def load_data(filename, set_name, number_of_features):
     return labels, matrix
 
 if __name__ == "__main__":
-    if len(sys.argv) == 5:
-        filename = sys.argv[1]
-        modelname = sys.argv[2]
-        set_name = sys.argv[3]
-        number_of_features = sys.argv[4]
-    else:
-        print("The first argument should be the filename")
-        print("The second argument should be the modelname")
-        print("The third argument should be the set name")
-        print("The fourth argument should be the number of features")
+    if len(sys.argv) != 5:
+        print("Usage: svm_model.py <filename> <modelname> <set_name> <number_of_features>")
         exit()
+    filename = sys.argv[1]
+    modelname = sys.argv[2]
+    set_name = sys.argv[3]
+    number_of_features = int(sys.argv[4])
 
     # Load feature matrix and labels
     labels, matrix = load_data(filename, set_name, number_of_features)
