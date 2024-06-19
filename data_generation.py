@@ -82,12 +82,13 @@ def extract_scripts(session, page_source, url):
 def uses_anti_adblocker(page_source):
     # List of common phrases and keywords indicating an anti-adblocker message
     anti_adblock_phrases = [
-        'allow ads', 'ad blocker detected', 'adblock message', 'adblock notice',
-        'adblock popup', 'adblock warning', 'adblocker alert', 'adblocker detected',
-        'ads are how we support', 'disable ad block', 'disable adblock',
-        'disable adblock', 'disable your blocking software',
-        'disable your browser extension', 'disable your extension',
-        'disable your filter', 'enable ads', 'support us by disabling',
+        'allow ads', 'allowing ads', 'ad blocker detected', 'adblock message', 'adblock notice',
+        'adblock detected', 'adblock popup', 'adblock warning', 'adblocker alert', 
+        'adblocker detected', 'ads are how we support', 'continue without disabling', 
+        'continue without supporting', 'disable ad block', 'disable adblock', 
+        'disable your blocking software', 'disable your browser extension', 'disable your extension',
+        'disable your filter', 'enable ads', 'enabling ads', 'my ad blocker',
+        'my ad filter', 'my adblocker', 'my content blocker', 'support us by disabling',
         'support us by turning off', 'turn off adblocker', 'turn off to continue',
         'turn off your blocker', 'turn off your extension', 'turn off your filter',
         'we noticed you are using an adblocker', 'whitelist our page',
