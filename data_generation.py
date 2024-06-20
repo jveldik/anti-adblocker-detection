@@ -181,14 +181,11 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("You stopped the script")
     finally:
+        print(f"{visited_count} urls are stored")
+        
         # Quit the selenium instance
         driver.quit()
 
         # Save number of visited urls
         with open(f"data/last_visited_url.txt", "w") as file:
             file.write(str(last_visited_url))
-
-        # Print the number of urls with indication
-        with open("data/keyword_labeled_urls.csv", 'r') as file:
-            nr_labeled_urls = sum(1 for line in file if line.strip())
-            print(f"From the {visited_count} urls stored, {nr_labeled_urls} urls have been given an indication on using an anti adblocker")
