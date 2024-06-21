@@ -55,8 +55,9 @@ def process_urls(filename):
             url = row[0]
             if os.path.exists(f"data/features/{url}.pickle"):
                 print(f"Features already extracted for {url}")
-            features = extract_features_from_url(url)
-            save_features(url, features)
+            else:
+                features = extract_features_from_url(url)
+                save_features(url, features)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
