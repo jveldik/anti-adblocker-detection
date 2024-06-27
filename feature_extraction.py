@@ -53,9 +53,7 @@ def process_urls(filename):
         reader = csv.reader(file)
         for row in reader:
             url = row[0]
-            if os.path.exists(f"data/features/{url}.pickle"):
-                print(f"Features already extracted for {url}")
-            else:
+            if not os.path.exists(f"data/features/{url}.pickle"):
                 features = extract_features_from_url(url)
                 save_features(url, features)
 
