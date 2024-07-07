@@ -1,35 +1,30 @@
-import csv
-import os.path
-import sys
+import pandas as pd
 import tkinter as tk
 from tkinter import Frame, Button, LEFT
 from PIL import Image, ImageTk
 
-def get_urls_to_label(filename):
-    # Check if there are already some URLs labeled
-    if os.path.exists(f"data/manual_{filename}"):
-        with open(f"data/manual_{filename}", mode='r', newline='') as file:
-            nr_labeled_urls = sum(1 for line in file)
+def get_urls_to_label(df):
+    # Ensure 'manual' column exists and count already labeled URLs
+    if 'manual' in df.columns:
+        nr_labeled_urls = df['manual'].notna().sum()
     else:
+        df['manual'] = None
         nr_labeled_urls = 0
-    # Read the stored URLs
-    with open(f"data/{filename}", mode='r', newline='') as file:
-        reader = csv.reader(file)
-        urls = [(row[0], row[1]) for row in reader]
+
     # Split the URLs into true and false and interleave them
-    true_urls = [url for url in urls if url[1] == 'True']
-    false_urls = [url for url in urls if url[1] == 'False']
+    true_urls = df[df['keywords'] == True].values.tolist()
+    false_urls = df[df['keywords'] == False].values.tolist()
     min_len = min(len(true_urls), len(false_urls))
     interleaved_urls = [val for pair in zip(true_urls[:min_len], false_urls[:min_len]) for val in pair]
+
     # Return the interleaved urls, starting after the last labeled URL
     return interleaved_urls[nr_labeled_urls:]
     
-def save_label(url, label):
-    with open(f"data/manual_{filename}", "a", newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow([url, label])
+def save_label(df, url, label):
+    index = df[df.iloc[:, 0] == url].index[0]
+    df.at[index, 'manual'] = label
 
-def get_label(url, original_label, root):
+def get_label(df, rows, url, original_label, root):
     frame = Frame(root)
     frame.pack()
     text = f"Does {url} use a visible anti adblocker? \n Choose invalid, when the site is not visible."
@@ -46,9 +41,9 @@ def get_label(url, original_label, root):
     def save_and_next_label(response_label):
         if original_label == "True" and response_label == False:
             response_label = None
-        save_label(url, response_label)
+        save_label(df, url, response_label)
         frame.destroy()
-        process_urls(rows, root)
+        process_urls(df, rows, root)
     
     yes_button = Button(frame, text="Yes (space)", command=lambda: save_and_next_label(True), font=('Helvetica 12'))
     yes_button.pack(side=LEFT)
@@ -67,24 +62,23 @@ def get_label(url, original_label, root):
     root.bind('<BackSpace>', lambda e: save_and_next_label(None))
     root.bind('<e>', lambda e: root.destroy())
 
-def process_urls(rows, root):
+def process_urls(df, rows, root):
     if rows:
-        url, original_label = rows.pop(0)
-        get_label(url, original_label, root)
+        url, original_label, _ = rows.pop(0)
+        get_label(df, rows, url, original_label, root)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: label_urls.py <filename>")
-        exit()
-    filename = sys.argv[1]
+    df = pd.read_csv("data/stored_urls.csv")
+    rows = get_urls_to_label(df)
 
     root = tk.Tk()
     root.focus_set()
-    rows = get_urls_to_label(filename)
-    process_urls(rows, root)
+
+    process_urls(df, rows, root)
+
     root.eval('tk::PlaceWindow . center')
     root.mainloop()
 
-    with open(f"data/manual_{filename}", "r") as file:
-        nr_labeled_urls = sum(1 for line in file)
+    df.to_csv("data/stored_urls.csv", index=False)
+    nr_labeled_urls = df['manual'].notna().sum()
     print(f"You have labeled {nr_labeled_urls} urls.")

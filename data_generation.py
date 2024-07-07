@@ -17,6 +17,10 @@ def get_last_visited_url():
             content = file.read()
             return int(content)
     else:
+        # Write header
+        with open("data/stored_urls.csv", "a", newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["url", "keywords"])
         return 0
 
 def create_driver():
@@ -147,7 +151,7 @@ def visit_url(driver, session, url, visited_count):
                 else:
                     label = None
                 # Save the current url
-                with open("data/keyword_labeled_urls.csv", "a", newline='') as file:
+                with open("data/stored_urls.csv", "a", newline='') as file:
                     writer = csv.writer(file)
                     writer.writerow([current_url, label])
             else:
