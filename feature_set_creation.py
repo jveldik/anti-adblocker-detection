@@ -68,8 +68,7 @@ def extract_features_and_labels():
     labels = []
     df = pd.read_csv("data/stored_urls.csv")
     df = df[df['manual'].notnull()]
-    for row in df:
-        url = row[0]
+    for url in df['url'].to_list():
         features = load_features(url)
         for feature_list, url_features in zip(feature_lists, features):
             feature_list.append(url_features)
