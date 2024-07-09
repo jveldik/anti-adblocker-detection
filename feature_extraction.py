@@ -1,7 +1,7 @@
 import os
-import csv
 import esprima
 import pickle
+import pandas as pd
 
 # Function to extract features from an AST
 def extract_features_from_AST(node, new_features):
@@ -48,10 +48,8 @@ def save_features(url, features):
         pickle.dump(features, f)
 
 if __name__ == "__main__":
-    with open("data/stored_urls.csv", mode='r') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            url = row[0]
-            if not os.path.exists(f"data/features/{url}.pickle"):
-                features = extract_features_from_url(url)
-                save_features(url, features)
+    df = pd.read_csv("data/stored_urls.csv")
+    for url in df['url'].to_list():
+        if not os.path.exists(f"data/features/{url}.pickle"):
+            features = extract_features_from_url(url)
+            save_features(url, features)
