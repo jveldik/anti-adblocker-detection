@@ -8,30 +8,24 @@ from sklearn.metrics import classification_report
 from sklearn.utils.class_weight import compute_class_weight
 
 # Load the saved matrices and feature sets
-def load_data(filename, set_name, number_of_features):
+def load_data(set_name, number_of_features):
     labels = []
-    with open(f"data/{filename}", mode='r') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            if row[1] == "True":
-                labels.append(True)
-            elif row[1] == "False":
-                labels.append(False)
+    df = pd.read_csv("data/stored_urls.csv")
+    labels = df['manual'].notnull().tolist()
     with open(f"data/matrices/{set_name}_{number_of_features}.pickle", 'rb') as f:
         matrix = pickle.load(f)
     return labels, matrix
 
 if __name__ == "__main__":
-    if len(sys.argv) != 5:
-        print("Usage: svm_model.py <filename> <modelname> <set_name> <number_of_features>")
+    if len(sys.argv) != 4:
+        print("Usage: svm_model.py <modelname> <set_name> <number_of_features>")
         exit()
-    filename = sys.argv[1]
-    modelname = sys.argv[2]
-    set_name = sys.argv[3]
-    number_of_features = int(sys.argv[4])
+    modelname = sys.argv[1]
+    set_name = sys.argv[2]
+    number_of_features = int(sys.argv[3])
 
     # Load feature matrix and labels
-    labels, matrix = load_data(filename, set_name, number_of_features)
+    labels, matrix = load_data(set_name, number_of_features)
 
     # Convert labels to a numpy array
     labels = np.array(labels)

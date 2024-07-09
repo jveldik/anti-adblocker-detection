@@ -1,7 +1,5 @@
-import os
-import csv
 import pickle
-import sys
+import pandas as pd
 from scipy.sparse import lil_matrix
 from sklearn.feature_selection import chi2, SelectKBest, VarianceThreshold
 
@@ -65,30 +63,20 @@ def filter_matrices(matrices, feature_sets, labels):
             print("Saving data")
             save_data(matrix, feature_set, i, k)
 
-def extract_features_and_labels(filename):
+def extract_features_and_labels():
     feature_lists = [[], [], []]
     labels = []
-    with open(f"data/{filename}", mode='r') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            url = row[0]
-            label = row[1]
-            if label == "True":
-                labels.append(True)
-            elif label == "False":
-                labels.append(False)
-            else:
-                continue
-            features = load_features(url)
-            for feature_list, url_features in zip(feature_lists, features):
-                feature_list.append(url_features)
+    df = pd.read_csv("data/stored_urls.csv")
+    df = df[df['manual'].notnull()]
+    for row in df:
+        url = row[0]
+        features = load_features(url)
+        for feature_list, url_features in zip(feature_lists, features):
+            feature_list.append(url_features)
+    labels = df['manual'].tolist()
     return feature_lists, labels
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: feature_set_creation.py <filename>")
-        exit()
-    filename = sys.argv[1]
-    feature_lists, labels = extract_features_and_labels(filename)
+    feature_lists, labels = extract_features_and_labels()
     feature_sets, matrices = create_matrices(feature_lists)
     filter_matrices(matrices, feature_sets, labels)
