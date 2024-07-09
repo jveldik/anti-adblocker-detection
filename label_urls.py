@@ -4,12 +4,9 @@ from tkinter import Frame, Button, LEFT
 from PIL import Image, ImageTk
 
 def get_urls_to_label(df):
-    # Ensure 'manual' column exists and count already labeled URLs
-    if 'manual' in df.columns:
-        nr_labeled_urls = df['manual'].notna().sum()
-    else:
+    # Ensure 'manual' column exists
+    if 'manual' not in df.columns:
         df['manual'] = None
-        nr_labeled_urls = 0
 
     # Split the URLs into true and false and interleave them
     true_urls = df[df['keywords'] == True].values.tolist()
@@ -17,8 +14,16 @@ def get_urls_to_label(df):
     min_len = min(len(true_urls), len(false_urls))
     interleaved_urls = [val for pair in zip(true_urls[:min_len], false_urls[:min_len]) for val in pair]
 
+    # Find the last labeled URL in the interleaved list
+    last_labeled_index = -1
+    for i in range(len(interleaved_urls) - 1, -1, -1):
+        url = interleaved_urls[i][0]
+        if df.loc[df['url'] == url, 'manual'].notna().any():
+            last_labeled_index = i
+            break
+
     # Return the interleaved urls, starting after the last labeled URL
-    return interleaved_urls[nr_labeled_urls:]
+    return interleaved_urls[last_labeled_index + 1:]
     
 def save_label(df, url, label):
     index = df[df.iloc[:, 0] == url].index[0]
