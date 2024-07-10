@@ -7,26 +7,7 @@ from sklearn.model_selection import StratifiedKFold, cross_val_score, cross_val_
 from sklearn.metrics import classification_report
 from sklearn.utils.class_weight import compute_class_weight
 
-# Load the saved matrices and feature sets
-def load_data(set_name, number_of_features):
-    labels = []
-    df = pd.read_csv("data/stored_urls.csv")
-    labels = df['manual'].notnull().tolist()
-    with open(f"data/matrices/{set_name}_{number_of_features}.pickle", 'rb') as f:
-        matrix = pickle.load(f)
-    return labels, matrix
-
-if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: svm_model.py <modelname> <set_name> <number_of_features>")
-        exit()
-    modelname = sys.argv[1]
-    set_name = sys.argv[2]
-    number_of_features = int(sys.argv[3])
-
-    # Load feature matrix and labels
-    labels, matrix = load_data(set_name, number_of_features)
-
+def create_model(labels, matrix):
     # Convert labels to a numpy array
     labels = np.array(labels)
 
@@ -52,6 +33,37 @@ if __name__ == "__main__":
     classification_rep = classification_report(labels, y_pred)
     print("Classification Report:\n", classification_rep)
 
-    # Save the model
-    with open(f"data/models/{modelname}_{set_name}_{number_of_features}.pickle", 'wb') as f:
-        pickle.dump(clf, f)
+    return clf, cross_val_scores, classification_rep
+
+if __name__ == "__main__":
+    df = pd.read_csv("data/stored_urls.csv")
+    labels = df['manual'].dropna().tolist()
+    results = []
+    
+    for set_name in ["all", "identifier", "literal"]:
+        for number_of_features in [100, 1000, 10000]:
+            # Load feature matrix
+            with open(f"data/matrices/{set_name}_{number_of_features}.pickle", 'rb') as f:
+                matrix = pickle.load(f)
+            clf, cross_val_scores, classification_rep = create_model(labels, matrix)
+            # Save the model
+            with open(f"data/models/svm_{set_name}_{number_of_features}.pickle", 'wb') as f:
+                pickle.dump(clf, f)
+            # Store the results
+            result = {
+                'set_name': set_name,
+                'number_of_features': number_of_features,
+                'cross_val_scores': cross_val_scores,
+                'mean_accuracy': np.mean(cross_val_scores),
+                'classification_report': classification_rep
+            }
+            results.append(result)
+
+    # Convert results to a DataFrame
+    results_df = pd.DataFrame(results)
+
+    # Print the table of accuracy scores
+    print(results_df[['set_name', 'number_of_features', 'cross_val_scores', 'mean_accuracy']])
+
+    # Write the results to a CSV file
+    results_df.to_csv('data/svm_results.csv', index=False)
