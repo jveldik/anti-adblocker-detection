@@ -6,11 +6,11 @@ from scipy.sparse import lil_matrix
 # Function to create a sparse row vector from feature lists
 def create_sparse_row(feature_lists, feature_dict, set_name):
     if set_name == "all":
-        relevant_features = list(set(feature_lists[0][0]))
+        relevant_features = list(set(feature_lists[0]))
     elif set_name == "literal":
-        relevant_features = list(set(feature_lists[1][0]))
+        relevant_features = list(set(feature_lists[1]))
     elif set_name == "identifier":
-        relevant_features = list(set(feature_lists[2][0]))
+        relevant_features = list(set(feature_lists[2]))
 
     feature_vector = lil_matrix((1, len(feature_dict)), dtype=bool)
     for feature in relevant_features:
@@ -37,7 +37,7 @@ def collect_feature_data(df, feature_dict, set_name):
     # Convert the sparse matrix to CSR format for efficient row slicing
     features_matrix = features_matrix.tocsr()
     
-    return urls, features_matrix
+    return features_matrix
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
