@@ -54,7 +54,7 @@ if __name__ == "__main__":
                 'number_of_features': number_of_features,
                 'cross_val_scores': cross_val_scores,
                 'mean_accuracy': np.mean(cross_val_scores),
-                'classification_report': classification_rep
+                'classification_report': '\n' + classification_rep
             }
             results.append(result)
 
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     results_df = pd.DataFrame(results)
 
     # Print the table of accuracy scores
-    print(results_df[['set_name', 'number_of_features', 'cross_val_scores', 'mean_accuracy']])
+    print(results_df[['set_name', 'number_of_features', 'mean_accuracy']])
 
     # Write the results to a CSV file
     results_df.to_csv('data/svm_results.csv', index=False)
