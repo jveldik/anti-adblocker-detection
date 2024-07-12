@@ -18,10 +18,10 @@ python feature_set_creation.py
 ```
 Now that we have feature sets and data models can be trained. In this project a svm and a cnn model are used.
 ```
-python svm_model.py <modelname> <set_name> <number_of_features>
+python svm_model.py
 ```
 ```
-python cnn_model.py <modelname> <set_name> <number_of_features>
+python cnn_model.py
 ```
 Finally, there is also a script to run a model on all the data that is collected. This will result in a list of the urls that are stored, with a label given by the model indicating the use of an anti adblocker. 
 ```
