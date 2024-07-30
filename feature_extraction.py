@@ -13,18 +13,16 @@ def extract_features_from_AST(node, new_features):
                 text = str(current_node.value)
                 if text and len(text) < 50:
                     new_features[0].append(text)
-                    new_features[1].append(text)
             elif current_node.type == 'Identifier':
                 text = str(current_node.name)
                 if text and len(text) < 50:
-                    new_features[0].append(text)
-                    new_features[2].append(text)
+                    new_features[1].append(text)
             stack += reversed([value for key, value in current_node.items() if isinstance(value, (list, esprima.nodes.Node))])
         elif isinstance(current_node, list):
             stack += reversed(current_node)
 
 def extract_features_from_url(url):
-    new_features = [[],[],[]]
+    new_features = [[],[]]
     if not os.path.exists(f"data/scripts/{url}"):
         print(f"Directory data/scripts/{url} does not exist")
         return new_features

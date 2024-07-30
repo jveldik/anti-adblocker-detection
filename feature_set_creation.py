@@ -5,7 +5,9 @@ from sklearn.feature_selection import chi2, SelectKBest, VarianceThreshold
 
 def load_features(url):
     with open(f'data/features/{url}.pickle', 'rb') as f:
-        return pickle.load(f)
+        features = pickle.load(f)
+    all_features = ["l_" + feature for feature in features[0]] + ["i_" + feature for feature in features[1]]
+    return [all_features, features[0], features[1]]
 
 def create_matrices(feature_lists):
     feature_sets = [None, None, None]

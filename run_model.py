@@ -6,11 +6,11 @@ from scipy.sparse import lil_matrix
 # Function to create a sparse row vector from feature lists
 def create_sparse_row(feature_lists, feature_dict, set_name):
     if set_name == "all":
-        relevant_features = list(set(feature_lists[0]))
+        relevant_features = ["l_" + feature for feature in list(set(feature_lists[0]))] + ["i_" + feature for feature in list(set(feature_lists[1]))]
     elif set_name == "literal":
-        relevant_features = list(set(feature_lists[1]))
+        relevant_features = list(set(feature_lists[0]))
     elif set_name == "identifier":
-        relevant_features = list(set(feature_lists[2]))
+        relevant_features = list(set(feature_lists[1]))
 
     feature_vector = lil_matrix((1, len(feature_dict)), dtype=bool)
     for feature in relevant_features:
