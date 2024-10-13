@@ -1,5 +1,6 @@
 beautifulsoup4==4.11.1
 esprima=4.0.1
+imbalanced-learn==0.12.3
 Pillow==9.0.1
 requests==2.31.0
 scikit-learn==1.0.2

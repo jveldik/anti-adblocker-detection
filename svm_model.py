@@ -1,6 +1,7 @@
 import pickle
 import numpy as np
 import pandas as pd
+from imblearn.over_sampling import SMOTE
 from sklearn import svm
 from sklearn.model_selection import StratifiedKFold, cross_val_score, cross_val_predict
 from sklearn.metrics import classification_report
@@ -38,16 +39,22 @@ if __name__ == "__main__":
     df = pd.read_csv("data/stored_urls.csv")
     labels = df['manual'].dropna().tolist()
     results = []
+    results_resampled = []
+    smote = SMOTE(sampling_strategy='auto', random_state=42)
     
     for set_name in ["all", "identifier", "literal"]:
         for number_of_features in [100, 1000, 10000]:
             # Load feature matrix
             with open(f"data/matrices/{set_name}_{number_of_features}.pickle", 'rb') as f:
                 matrix = pickle.load(f)
+            matrix_resampled, labels_resampled = smote.fit_resample(matrix, labels)
             clf, cross_val_scores, classification_rep = create_model(labels, matrix)
-            # Save the model
+            clf_resampled, cross_val_scores_resampled, classification_rep_resampled = create_model(labels_resampled, matrix_resampled)
+            # Save the models
             with open(f"data/models/svm_{set_name}_{number_of_features}.pickle", 'wb') as f:
                 pickle.dump(clf, f)
+            with open(f"data/models/svm_resampled_{set_name}_{number_of_features}.pickle", 'wb') as f:
+                pickle.dump(clf_resampled, f)
             # Store the results
             result = {
                 'set_name': set_name,
@@ -57,12 +64,23 @@ if __name__ == "__main__":
                 'classification_report': '\n' + classification_rep
             }
             results.append(result)
+            result_resampled = {
+                'set_name': set_name,
+                'number_of_features': number_of_features,
+                'cross_val_scores': cross_val_scores_resampled,
+                'mean_accuracy': np.mean(cross_val_scores_resampled),
+                'classification_report': '\n' + classification_rep_resampled
+            }
+            results_resampled.append(result_resampled)
 
-    # Convert results to a DataFrame
+    # Convert results to DataFrames
     results_df = pd.DataFrame(results)
+    results_resampled_df = pd.DataFrame(results_resampled)
 
     # Print the table of accuracy scores
     print(results_df[['set_name', 'number_of_features', 'mean_accuracy']])
+    print(results_resampled_df[['set_name', 'number_of_features', 'mean_accuracy']])
 
     # Write the results to a CSV file
     results_df.to_csv('data/svm_results.csv', index=False)
+    results_resampled_df.to_csv('data/svm_resampled_results.csv', index=False)
