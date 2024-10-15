@@ -9,15 +9,22 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Conv1D, GlobalMaxPooling1D
 
 # Define the CNN model
-def create_cnn_model(input_dim):
+def create_cnn_model(input_dim, class_weights):
     model = Sequential()
     model.add(Conv1D(filters=128, kernel_size=5, activation='relu', input_shape=(input_dim, 1)))
     model.add(GlobalMaxPooling1D())
     model.add(Dense(256, activation='relu'))
     model.add(Dropout(0.5))
     model.add(Dense(2, activation='softmax'))  # 2 output classes
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer='adam', loss='binary_crossentropy', loss_weights=class_weights, metrics=['accuracy'])
     return model
+
+def compute_class_weights(labels):
+    # Compute class weights based on the frequency of each class
+    class_weights = np.sum(labels, axis=0)
+    total_samples = len(labels)
+    class_weights = total_samples / (len(class_weights) * class_weights)
+    return class_weights
 
 def create_model(labels, matrix):
     # Reshape matrix for CNN input
@@ -28,11 +35,14 @@ def create_model(labels, matrix):
     cross_val_predictions = []
     cross_val_scores = []
 
+    # Compute class weights
+    class_weights = compute_class_weights(labels)
+
     for train_index, test_index in skf.split(matrix, np.argmax(labels, axis=1)):
         X_train, X_test = matrix[train_index], matrix[test_index]
         y_train, y_test = labels[train_index], labels[test_index]
         
-        model = create_cnn_model(input_dim=number_of_features)
+        model = create_cnn_model(number_of_features, class_weights)
         model.fit(X_train, y_train, epochs=10, batch_size=32, verbose=1)
         
         y_pred = model.predict(X_test)
