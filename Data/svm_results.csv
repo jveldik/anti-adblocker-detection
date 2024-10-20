@@ -9,6 +9,16 @@ all,100,Class weights,"{'C': 0.1, 'degree': 2, 'gamma': 'scale', 'kernel': 'line
    macro avg       0.70      0.64      0.66       147
 weighted avg       0.77      0.80      0.78       147
 "
+all,100,Oversampling,"{'C': 1, 'degree': 2, 'gamma': 'scale', 'kernel': 'linear'}",0.6901030485186777,0.7192982456140351,"
+              precision    recall  f1-score   support
+
+       False       0.66      0.92      0.77       114
+        True       0.87      0.52      0.65       114
+
+    accuracy                           0.72       228
+   macro avg       0.76      0.72      0.71       228
+weighted avg       0.76      0.72      0.71       228
+"
 all,1000,Class weights,"{'C': 5, 'degree': 2, 'gamma': 'scale', 'kernel': 'poly'}",0.8843973442288048,0.8367346938775511,"
               precision    recall  f1-score   support
 
@@ -18,6 +28,16 @@ all,1000,Class weights,"{'C': 5, 'degree': 2, 'gamma': 'scale', 'kernel': 'poly'
     accuracy                           0.84       147
    macro avg       0.77      0.73      0.75       147
 weighted avg       0.83      0.84      0.83       147
+"
+all,1000,Oversampling,"{'C': 5, 'degree': 2, 'gamma': 0.1, 'kernel': 'rbf'}",0.8742056676685273,0.8771929824561403,"
+              precision    recall  f1-score   support
+
+       False       0.88      0.88      0.88       114
+        True       0.88      0.88      0.88       114
+
+    accuracy                           0.88       228
+   macro avg       0.88      0.88      0.88       228
+weighted avg       0.88      0.88      0.88       228
 "
 all,10000,Class weights,"{'C': 0.5, 'degree': 2, 'gamma': 0.01, 'kernel': 'poly'}",0.8775280898876405,0.8095238095238095,"
               precision    recall  f1-score   support
@@ -29,6 +49,16 @@ all,10000,Class weights,"{'C': 0.5, 'degree': 2, 'gamma': 0.01, 'kernel': 'poly'
    macro avg       0.73      0.68      0.70       147
 weighted avg       0.80      0.81      0.80       147
 "
+all,10000,Oversampling,"{'C': 10, 'degree': 2, 'gamma': 0.01, 'kernel': 'rbf'}",0.9108200944611422,0.8947368421052632,"
+              precision    recall  f1-score   support
+
+       False       0.94      0.84      0.89       114
+        True       0.86      0.95      0.90       114
+
+    accuracy                           0.89       228
+   macro avg       0.90      0.89      0.89       228
+weighted avg       0.90      0.89      0.89       228
+"
 identifier,100,Class weights,"{'C': 0.1, 'degree': 2, 'gamma': 'scale', 'kernel': 'linear'}",0.8231103166496425,0.7959183673469388,"
               precision    recall  f1-score   support
 
@@ -38,6 +68,16 @@ identifier,100,Class weights,"{'C': 0.1, 'degree': 2, 'gamma': 'scale', 'kernel'
     accuracy                           0.80       147
    macro avg       0.70      0.64      0.66       147
 weighted avg       0.77      0.80      0.78       147
+"
+identifier,100,Oversampling,"{'C': 1, 'degree': 2, 'gamma': 'scale', 'kernel': 'linear'}",0.6901030485186777,0.7192982456140351,"
+              precision    recall  f1-score   support
+
+       False       0.66      0.92      0.77       114
+        True       0.87      0.52      0.65       114
+
+    accuracy                           0.72       228
+   macro avg       0.76      0.72      0.71       228
+weighted avg       0.76      0.72      0.71       228
 "
 identifier,1000,Class weights,"{'C': 5, 'degree': 2, 'gamma': 'scale', 'kernel': 'poly'}",0.884320735444331,0.8299319727891157,"
               precision    recall  f1-score   support
@@ -49,6 +89,16 @@ identifier,1000,Class weights,"{'C': 5, 'degree': 2, 'gamma': 'scale', 'kernel':
    macro avg       0.76      0.72      0.73       147
 weighted avg       0.82      0.83      0.82       147
 "
+identifier,1000,Oversampling,"{'C': 5, 'degree': 2, 'gamma': 0.1, 'kernel': 'rbf'}",0.8947402318591671,0.8640350877192983,"
+              precision    recall  f1-score   support
+
+       False       0.90      0.82      0.86       114
+        True       0.83      0.91      0.87       114
+
+    accuracy                           0.86       228
+   macro avg       0.87      0.86      0.86       228
+weighted avg       0.87      0.86      0.86       228
+"
 identifier,10000,Class weights,"{'C': 0.1, 'degree': 2, 'gamma': 'scale', 'kernel': 'linear'}",0.8752042900919305,0.8027210884353742,"
               precision    recall  f1-score   support
 
@@ -58,6 +108,16 @@ identifier,10000,Class weights,"{'C': 0.1, 'degree': 2, 'gamma': 'scale', 'kerne
     accuracy                           0.80       147
    macro avg       0.71      0.70      0.71       147
 weighted avg       0.80      0.80      0.80       147
+"
+identifier,10000,Oversampling,"{'C': 10, 'degree': 2, 'gamma': 0.01, 'kernel': 'rbf'}",0.9239909832546157,0.8991228070175439,"
+              precision    recall  f1-score   support
+
+       False       0.88      0.93      0.90       114
+        True       0.93      0.87      0.90       114
+
+    accuracy                           0.90       228
+   macro avg       0.90      0.90      0.90       228
+weighted avg       0.90      0.90      0.90       228
 "
 literal,100,Class weights,"{'C': 0.1, 'degree': 2, 'gamma': 'scale', 'kernel': 'linear'}",0.8231103166496425,0.7959183673469388,"
               precision    recall  f1-score   support
@@ -69,6 +129,16 @@ literal,100,Class weights,"{'C': 0.1, 'degree': 2, 'gamma': 'scale', 'kernel': '
    macro avg       0.70      0.64      0.66       147
 weighted avg       0.77      0.80      0.78       147
 "
+literal,100,Oversampling,"{'C': 0.1, 'degree': 2, 'gamma': 'scale', 'kernel': 'linear'}",0.6813331902103907,0.6973684210526315,"
+              precision    recall  f1-score   support
+
+       False       0.64      0.92      0.75       114
+        True       0.86      0.47      0.61       114
+
+    accuracy                           0.70       228
+   macro avg       0.75      0.70      0.68       228
+weighted avg       0.75      0.70      0.68       228
+"
 literal,1000,Class weights,"{'C': 0.1, 'degree': 2, 'gamma': 'scale', 'kernel': 'linear'}",0.8707609805924413,0.8027210884353742,"
               precision    recall  f1-score   support
 
@@ -78,6 +148,16 @@ literal,1000,Class weights,"{'C': 0.1, 'degree': 2, 'gamma': 'scale', 'kernel': 
     accuracy                           0.80       147
    macro avg       0.72      0.71      0.71       147
 weighted avg       0.80      0.80      0.80       147
+"
+literal,1000,Oversampling,"{'C': 5, 'degree': 2, 'gamma': 0.1, 'kernel': 'rbf'}",0.8610884499785316,0.8596491228070176,"
+              precision    recall  f1-score   support
+
+       False       0.85      0.87      0.86       114
+        True       0.87      0.85      0.86       114
+
+    accuracy                           0.86       228
+   macro avg       0.86      0.86      0.86       228
+weighted avg       0.86      0.86      0.86       228
 "
 literal,10000,Class weights,"{'C': 10, 'degree': 2, 'gamma': 0.001, 'kernel': 'rbf'}",0.8752553626149133,0.8299319727891157,"
               precision    recall  f1-score   support
@@ -89,87 +169,7 @@ literal,10000,Class weights,"{'C': 10, 'degree': 2, 'gamma': 0.001, 'kernel': 'r
    macro avg       0.76      0.72      0.73       147
 weighted avg       0.82      0.83      0.82       147
 "
-all,100,SMOTE,"{'C': 1, 'degree': 2, 'gamma': 'scale', 'kernel': 'linear'}",0.6901030485186777,0.7192982456140351,"
-              precision    recall  f1-score   support
-
-       False       0.66      0.92      0.77       114
-        True       0.87      0.52      0.65       114
-
-    accuracy                           0.72       228
-   macro avg       0.76      0.72      0.71       228
-weighted avg       0.76      0.72      0.71       228
-"
-all,1000,SMOTE,"{'C': 5, 'degree': 2, 'gamma': 0.1, 'kernel': 'rbf'}",0.8742056676685273,0.8771929824561403,"
-              precision    recall  f1-score   support
-
-       False       0.88      0.88      0.88       114
-        True       0.88      0.88      0.88       114
-
-    accuracy                           0.88       228
-   macro avg       0.88      0.88      0.88       228
-weighted avg       0.88      0.88      0.88       228
-"
-all,10000,SMOTE,"{'C': 10, 'degree': 2, 'gamma': 0.01, 'kernel': 'rbf'}",0.9108200944611422,0.8947368421052632,"
-              precision    recall  f1-score   support
-
-       False       0.94      0.84      0.89       114
-        True       0.86      0.95      0.90       114
-
-    accuracy                           0.89       228
-   macro avg       0.90      0.89      0.89       228
-weighted avg       0.90      0.89      0.89       228
-"
-identifier,100,SMOTE,"{'C': 1, 'degree': 2, 'gamma': 'scale', 'kernel': 'linear'}",0.6901030485186777,0.7192982456140351,"
-              precision    recall  f1-score   support
-
-       False       0.66      0.92      0.77       114
-        True       0.87      0.52      0.65       114
-
-    accuracy                           0.72       228
-   macro avg       0.76      0.72      0.71       228
-weighted avg       0.76      0.72      0.71       228
-"
-identifier,1000,SMOTE,"{'C': 5, 'degree': 2, 'gamma': 0.1, 'kernel': 'rbf'}",0.8947402318591671,0.8640350877192983,"
-              precision    recall  f1-score   support
-
-       False       0.90      0.82      0.86       114
-        True       0.83      0.91      0.87       114
-
-    accuracy                           0.86       228
-   macro avg       0.87      0.86      0.86       228
-weighted avg       0.87      0.86      0.86       228
-"
-identifier,10000,SMOTE,"{'C': 10, 'degree': 2, 'gamma': 0.01, 'kernel': 'rbf'}",0.9239909832546157,0.8991228070175439,"
-              precision    recall  f1-score   support
-
-       False       0.88      0.93      0.90       114
-        True       0.93      0.87      0.90       114
-
-    accuracy                           0.90       228
-   macro avg       0.90      0.90      0.90       228
-weighted avg       0.90      0.90      0.90       228
-"
-literal,100,SMOTE,"{'C': 0.1, 'degree': 2, 'gamma': 'scale', 'kernel': 'linear'}",0.6813331902103907,0.6973684210526315,"
-              precision    recall  f1-score   support
-
-       False       0.64      0.92      0.75       114
-        True       0.86      0.47      0.61       114
-
-    accuracy                           0.70       228
-   macro avg       0.75      0.70      0.68       228
-weighted avg       0.75      0.70      0.68       228
-"
-literal,1000,SMOTE,"{'C': 5, 'degree': 2, 'gamma': 0.1, 'kernel': 'rbf'}",0.8610884499785316,0.8596491228070176,"
-              precision    recall  f1-score   support
-
-       False       0.85      0.87      0.86       114
-        True       0.87      0.85      0.86       114
-
-    accuracy                           0.86       228
-   macro avg       0.86      0.86      0.86       228
-weighted avg       0.86      0.86      0.86       228
-"
-literal,10000,SMOTE,"{'C': 10, 'degree': 2, 'gamma': 0.01, 'kernel': 'rbf'}",0.9152103907256333,0.9035087719298246,"
+literal,10000,Oversampling,"{'C': 10, 'degree': 2, 'gamma': 0.01, 'kernel': 'rbf'}",0.9152103907256333,0.9035087719298246,"
               precision    recall  f1-score   support
 
        False       0.93      0.88      0.90       114

@@ -64,7 +64,7 @@ if __name__ == "__main__":
                 matrix = pickle.load(f)
             matrix_resampled, labels_resampled = smote.fit_resample(matrix, labels)
             clf, result = create_model(matrix, labels, "Class weights")
-            clf_resampled, result_resampled = create_model(matrix_resampled, labels_resampled, "SMOTE")
+            clf_resampled, result_resampled = create_model(matrix_resampled, labels_resampled, "Oversampling")
             # Save the models
             with open(f"data/models/svm_{set_name}_{number_of_features}.pickle", 'wb') as f:
                 pickle.dump(clf, f)
@@ -72,10 +72,9 @@ if __name__ == "__main__":
                 pickle.dump(clf_resampled, f)
             # Store the results
             results.append(result)
-            results_resampled.append(result_resampled)
+            results.append(result_resampled)
 
     # Convert results to DataFrame
-    results = results + results_resampled
     results_df = pd.DataFrame(results)
 
     # Print the table of accuracy scores
