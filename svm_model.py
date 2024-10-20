@@ -2,38 +2,53 @@ import pickle
 import numpy as np
 import pandas as pd
 from imblearn.over_sampling import SMOTE
-from sklearn import svm
-from sklearn.model_selection import StratifiedKFold, cross_val_score, cross_val_predict
-from sklearn.metrics import classification_report
-from sklearn.utils.class_weight import compute_class_weight
+from sklearn.svm import SVC
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
+from sklearn.metrics import accuracy_score, classification_report
 
-def create_model(labels, matrix):
+def create_model(matrix, labels, balancing):
     # Convert labels to a numpy array
     labels = np.array(labels)
 
-    # Compute class weights
-    class_weights = compute_class_weight('balanced', classes=[False, True], y=labels)
-    class_weight_dict = {False: class_weights[0], True: class_weights[1]}
+    X_train, X_test, y_train, y_test = train_test_split(matrix, labels, test_size=0.25, random_state=42, stratify = labels)
+
+    parameters = {
+        'C': [0.1, 0.5, 1, 5, 10],
+        'gamma': ['scale', 'auto', 0.001, 0.01, 0.1],
+        'kernel': ['linear', 'poly', 'rbf'],
+        'degree': [2, 3, 4]
+    }
 
     # Initialize the SVM classifier with class weights
-    clf = svm.SVC(class_weight=class_weight_dict)
+    svc = SVC(class_weight='balanced')
 
-    # Perform stratified k-fold cross-validation
-    skf = StratifiedKFold(n_splits=5)
-    cross_val_scores = cross_val_score(clf, matrix, labels, cv=skf, scoring='accuracy')
+    # Initialize stratified k-fold cross-validation
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-    print("Cross-validation accuracy scores:", cross_val_scores)
-    print("Mean cross-validation accuracy:", np.mean(cross_val_scores))
+    # Initialize a grid search for the best parameters based on the accuracy score
+    clf = GridSearchCV(svc, parameters, scoring='accuracy', cv=skf)
 
-    # Train the classifier on the entire dataset
-    clf.fit(matrix, labels)
+    # Train the model with the data
+    clf.fit(X_train, y_train)
 
-    # Generate a classification report using cross-validation
-    y_pred = cross_val_predict(clf, matrix, labels, cv=skf)
-    classification_rep = classification_report(labels, y_pred)
-    print("Classification Report:\n", classification_rep)
+    y_pred = clf.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    classification_rep = classification_report(y_test, y_pred)
 
-    return clf, cross_val_scores, classification_rep
+    result = {
+            'Set name': set_name,
+            'Number of features': number_of_features,
+            'Class balancing': balancing,
+            'Best parameters': clf.best_params_,
+            'Training accuracy': clf.best_score_,
+            'Test accuracy': accuracy,
+            'Classification report': '\n' + classification_rep
+            }
+    
+    for key, value in result.items():
+        print(key, ":", value)
+    
+    return clf, result
 
 if __name__ == "__main__":
     df = pd.read_csv("data/stored_urls.csv")
@@ -48,39 +63,23 @@ if __name__ == "__main__":
             with open(f"data/matrices/{set_name}_{number_of_features}.pickle", 'rb') as f:
                 matrix = pickle.load(f)
             matrix_resampled, labels_resampled = smote.fit_resample(matrix, labels)
-            clf, cross_val_scores, classification_rep = create_model(labels, matrix)
-            clf_resampled, cross_val_scores_resampled, classification_rep_resampled = create_model(labels_resampled, matrix_resampled)
+            clf, result = create_model(matrix, labels, "Class weights")
+            clf_resampled, result_resampled = create_model(matrix_resampled, labels_resampled, "SMOTE")
             # Save the models
             with open(f"data/models/svm_{set_name}_{number_of_features}.pickle", 'wb') as f:
                 pickle.dump(clf, f)
             with open(f"data/models/svm_resampled_{set_name}_{number_of_features}.pickle", 'wb') as f:
                 pickle.dump(clf_resampled, f)
             # Store the results
-            result = {
-                'set_name': set_name,
-                'number_of_features': number_of_features,
-                'cross_val_scores': cross_val_scores,
-                'mean_accuracy': np.mean(cross_val_scores),
-                'classification_report': '\n' + classification_rep
-            }
             results.append(result)
-            result_resampled = {
-                'set_name': set_name,
-                'number_of_features': number_of_features,
-                'cross_val_scores': cross_val_scores_resampled,
-                'mean_accuracy': np.mean(cross_val_scores_resampled),
-                'classification_report': '\n' + classification_rep_resampled
-            }
             results_resampled.append(result_resampled)
 
-    # Convert results to DataFrames
+    # Convert results to DataFrame
+    results = results + results_resampled
     results_df = pd.DataFrame(results)
-    results_resampled_df = pd.DataFrame(results_resampled)
 
     # Print the table of accuracy scores
-    print(results_df[['set_name', 'number_of_features', 'mean_accuracy']])
-    print(results_resampled_df[['set_name', 'number_of_features', 'mean_accuracy']])
+    print(results_df[['Set name', 'Number of features', 'Class balancing', 'Training accuracy', 'Test accuracy']])
 
     # Write the results to a CSV file
     results_df.to_csv('data/svm_results.csv', index=False)
-    results_resampled_df.to_csv('data/svm_resampled_results.csv', index=False)
