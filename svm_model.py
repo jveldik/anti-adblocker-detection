@@ -31,6 +31,7 @@ def create_model(matrix, labels, balancing):
     # Train the model with the data
     clf.fit(X_train, y_train)
 
+    # Predict on the test set
     y_pred = clf.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
     classification_rep = classification_report(y_test, y_pred)
