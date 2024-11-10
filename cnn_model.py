@@ -3,72 +3,98 @@ import pickle
 import numpy as np
 import pandas as pd
 from imblearn.over_sampling import SMOTE
-from scikeras.wrappers import KerasClassifier
-from sklearn.model_selection import StratifiedKFold, train_test_split, GridSearchCV
+from keras_tuner import BayesianOptimization 
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.utils.class_weight import compute_class_weight
-import tensorflow as tf
+from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Conv1D, GlobalMaxPooling1D
+from tensorflow.keras.optimizers import Adam, RMSprop, SGD
 
-def create_cnn_model(input_dim, activation='relu', dropout=0.5, kernel_size=5, optimizer='adam'):
+def create_cnn_model(hp, input_dim, class_weights):
     model = Sequential()
-    model.add(Conv1D(filters=128, kernel_size=kernel_size, activation=activation, input_shape=(input_dim, 1)))
+    num_layers = hp.Choice("num_layers", values=[1, 2, 3])
+    dense_dropout = hp.Choice('dense_dropout', values=[0.3, 0.5, 0.7])
+    optimizer_choice = hp.Choice("optimizer", values=["adam", "RMSprop", "SGD"])
+    learning_rate = hp.Choice("learning_rate", values=[1e-3, 1e-4, 1e-5])
+    if optimizer_choice == "adam":
+        optimizer = Adam(learning_rate=learning_rate)
+    elif optimizer_choice == "RMSprop":
+        optimizer = RMSprop(learning_rate=learning_rate)
+    else:
+        optimizer = SGD(learning_rate=learning_rate)
+
+    for i in range(num_layers):
+        filters = hp.Choice(f'filters_{i}', values=[64, 128, 256])
+        kernel_size = hp.Choice(f'kernel_size_{i}', values=[3, 5, 7])
+        dropout = hp.Choice(f'dropout_{i}', values=[0.3, 0.5, 0.7])
+        # Input shape only needed for the first layer
+        if i == 0:
+            model.add(Conv1D(filters=filters, kernel_size=kernel_size, activation='relu', input_shape=(input_dim, 1)))
+        else:
+            model.add(Conv1D(filters=filters, kernel_size=kernel_size, activation='relu'))
+        model.add(Dropout(dropout))
+    
     model.add(GlobalMaxPooling1D())
-    model.add(Dense(256, activation='relu'))
-    model.add(Dropout(dropout))
-    model.add(Dense(1, activation='softmax'))  # 2 output classes
+    model.add(Dense(units=hp.Int('dense_units', min_value=128, max_value=512, step=128), activation='relu'))
+    model.add(Dropout(dense_dropout))
+    model.add(Dense(1, activation='sigmoid'))  # Binary classification output
     model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
     return model
 
 def create_model(matrix, labels, number_of_features, balancing):
-    # Convert labels to a numpy array
+    # Reshape labels and matrix for CNN input
     labels = np.array(labels)
-
-    # np.expand_dims(matrix, axis=1)
     matrix = matrix.toarray()
+
     # Split the data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(matrix, labels, test_size=0.25, random_state=42, stratify=labels)
 
+    X_train = X_train.astype("int32")
+    y_train = y_train.astype("int32")
+
     # Compute class weights based on the training labels
     class_weights = compute_class_weight('balanced', classes=np.unique(y_train), y=y_train)
-    class_weight_dict = dict(enumerate(class_weights))
+    # class_weights_dict = dict(enumerate(class_weights))
 
-    # Define the parameter grid for hyperparameter tuning
-    parameters = {
-        'batch_size': [32, 64],
-        'epochs': [10, 15, 20],
-        'dropout': [0.3, 0.5, 0.7],
-        'kernel_size': [3, 5, 7],
-        'optimizer': ['SGD', 'RMSprop', 'Adagrad', 'Adam'],
-        'optimizer__learning_rate': [0.001, 0.01, 0.1, 0.2],
-        'optimizer__momentum': [0.3, 0.5, 0.7]
-    }
+    # Initialize the tuner
+    tuner = BayesianOptimization(
+        lambda hp: create_cnn_model(hp, number_of_features, class_weights), 
+        objective='val_accuracy',
+        overwrite=True,
+        directory='.hidden_tuning',  # Hidden folder by prefixing with "."
+        project_name='temp_tuning'
+    )
 
-    # Wrap the Keras model with KerasClassifier for scikit-learn compatibility
-    cnn = KerasClassifier(model=create_cnn_model, input_dim=number_of_features, batch_size=64, epochs=10, dropout=0.5, kernel_size=5, optimizer='Adam', verbose=0)
-    # Initialize stratified k-fold cross-validation
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    # Run the hyperparameter search
+    tuner.search(
+        X_train, 
+        y_train, 
+        epochs=100, 
+        validation_split=0.2, 
+        callbacks=[EarlyStopping(monitor='val_loss', patience=3)], 
+        verbose=0
+    )
 
-    # Initialize a grid search for the best parameters based on the accuracy score
-    clf = GridSearchCV(cnn, parameters, scoring='accuracy', cv=skf, n_jobs=-1, verbose=0)
-
-    # Train the model with the training data and class weights
-    clf.fit(X_train, y_train, class_weight=class_weight_dict)
+    # Get the best model
+    clf = tuner.get_best_models(num_models=1)[0]
+    best_parameters = tuner.get_best_hyperparameters(num_trials=1)[0].values
+    training_accuracy = clf.evaluate(X_train, y_train, verbose=0)[1]
 
     # Predict on the test set
-    y_test_pred = clf.predict(X_test)
-    accuracy = accuracy_score(y_test, y_test_pred)
-    classification_rep = classification_report(y_test, y_test_pred)
+    y_test_pred = (clf.predict(X_test) > 0.5).astype("int32").flatten()
+    test_accuracy = accuracy_score(y_test, y_test_pred)
+    classification_rep = classification_report(y_test, y_test_pred, zero_division=1)
 
     # Print the results
     result = {
             'Set name': set_name,
             'Number of features': number_of_features,
             'Class balancing': balancing,
-            'Best parameters': clf.best_params_,
-            'Training accuracy': clf.best_score_,
-            'Test accuracy': accuracy,
+            'Best parameters': best_parameters,
+            'Training accuracy': training_accuracy,
+            'Test accuracy': test_accuracy,
             'Classification report': '\n' + classification_rep
             }
     
