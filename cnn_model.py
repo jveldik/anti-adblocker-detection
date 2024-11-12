@@ -16,8 +16,8 @@ from tensorflow.keras.optimizers import Adam, RMSprop, SGD
 def create_cnn_model(hp, input_dim, class_weights):
     model = Sequential()
     num_layers = hp.Choice("num_layers", values=[1, 2, 3])
-    dense_dropout = hp.Choice('dense_dropout', values=[0.2, 0.4, 0.6])
-    dense_units = hp.Choice(dense_units, values=[128, 256, 384, 512])
+    dense_dropout = hp.Choice("dense_dropout", values=[0.2, 0.4, 0.6])
+    dense_units = hp.Choice("dense_units", values=[128, 256, 384, 512])
     optimizer_choice = hp.Choice("optimizer", values=["adam", "RMSprop", "SGD"])
 
     if optimizer_choice == "adam":
@@ -28,9 +28,9 @@ def create_cnn_model(hp, input_dim, class_weights):
         optimizer = SGD(learning_rate=0.001)
 
     for i in range(num_layers):
-        filters = hp.Choice(f'filters_{i}', values=[64, 128, 256])
-        kernel_size = hp.Choice(f'kernel_size_{i}', values=[3, 5, 7])
-        dropout = hp.Choice(f'dropout_{i}', values=[0.2, 0.4, 0.6])
+        filters = hp.Choice(f"filters_{i}", values=[64, 128, 256])
+        kernel_size = hp.Choice(f"kernel_size_{i}", values=[3, 5, 7])
+        dropout = hp.Choice(f"dropout_{i}", values=[0.2, 0.4, 0.6])
         # Input shape only needed for the first layer
         if i == 0:
             model.add(Conv1D(filters=filters, kernel_size=kernel_size, activation='relu', input_shape=(input_dim, 1)))
