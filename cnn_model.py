@@ -47,7 +47,7 @@ def create_cnn_model(hp, input_dim, class_weights):
     return model
 
 def create_model(matrix, labels, set_name, number_of_features, balancing):
-    # Reshape labels and matrix for CNN input
+    # Reshape labels and matrix for cnn input
     labels = np.array(labels)
     matrix = matrix.toarray()
 
@@ -66,7 +66,7 @@ def create_model(matrix, labels, set_name, number_of_features, balancing):
         objective='val_accuracy',
         overwrite=True,
         directory='data/trials',
-        project_name=f"{set_name}_{number_of_features}_{balancing}"
+        project_name=f"cnn_{balancing}_{set_name}_{number_of_features}"
     )
 
     # Run the hyperparameter search
@@ -125,16 +125,20 @@ if __name__ == "__main__":
             # Load feature matrix
             with open(f"data/matrices/{set_name}_{number_of_features}.pickle", 'rb') as f:
                 matrix = pickle.load(f)
-            matrix_resampled, labels_resampled = smote.fit_resample(matrix, labels)
-            clf, result = create_model(matrix, labels, set_name, number_of_features, "Class weights")
-            clf_resampled, result_resampled = create_model(matrix_resampled, labels_resampled, set_name, number_of_features, "Oversampling")
-            # Save the models
-            with open(f"data/models/cnn_{set_name}_{number_of_features}.pickle", 'wb') as f:
+            balancing = "class_weights"
+            # Create and train the model
+            clf, result = create_model(matrix, labels, set_name, number_of_features, balancing)
+            # Save the model
+            with open(f"data/models/cnn_{balancing}_{set_name}_{number_of_features}.pickle", 'wb') as f:
                 pickle.dump(clf, f)
-            with open(f"data/models/cnn_resampled_{set_name}_{number_of_features}.pickle", 'wb') as f:
-                pickle.dump(clf_resampled, f)
             # Store the results
             results.append(result)
+            # Again with complete oversampling
+            balancing = "oversampling"
+            matrix_resampled, labels_resampled = smote.fit_resample(matrix, labels)
+            clf_resampled, result_resampled = create_model(matrix_resampled, labels_resampled, set_name, number_of_features, balancing)
+            with open(f"data/models/cnn_{balancing}_{set_name}_{number_of_features}.pickle", 'wb') as f:
+                pickle.dump(clf_resampled, f)
             results.append(result_resampled)
 
     # Convert results to DataFrame

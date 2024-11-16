@@ -1,7 +1,7 @@
 import pickle
-import sys
 import pandas as pd
 from scipy.sparse import lil_matrix
+from sklearn.metrics import confusion_matrix
 
 # Function to create a sparse row vector from feature lists
 def create_sparse_row(feature_lists, feature_dict, set_name):
@@ -39,19 +39,28 @@ def collect_feature_data(df, feature_dict, set_name):
     
     return features_matrix
 
-if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: run_model.py <modelname> <set_name> <number_of_features>")
-        exit()
-    modelname = sys.argv[1]
-    set_name = sys.argv[2]
-    number_of_features = int(sys.argv[3])
+def get_best_model(results_df):
+    # Find the index of the row with the highest "Test accuracy"
+    index_best_model = results_df["Test accuracy"].idxmax()
+    
+    # Extract the required information for the best model
+    set_name = results_df.loc[index_best_model, "Set name"]
+    number_of_features = results_df.loc[index_best_model, "Number of features"]
+    balancing = results_df.loc[index_best_model, "Class balancing"]
+    
+    return set_name, number_of_features, balancing
 
+if __name__ == "__main__":
     # Load the existing data
     df = pd.read_csv("data/stored_urls.csv")
+    keyword_labels = df['keywords'].fillna(2).tolist()
 
+    svm_results = pd.read_csv("data/svm_results.csv")
+    set_name, number_of_features, balancing = get_best_model(svm_results)
+    modelname = "svm"
+    
     # Load the model to predict the labels
-    with open(f"data/models/{modelname}_{set_name}_{number_of_features}.pickle", 'rb') as f:
+    with open(f"data/models/{modelname}_{balancing}_{set_name}_{number_of_features}.pickle", 'rb') as f:
         model = pickle.load(f)
 
     # Load the features the model uses
@@ -67,8 +76,41 @@ if __name__ == "__main__":
     # Predict labels for the new data
     labels = model.predict(features_matrix)
 
+    # Print confusion matrix
+    print(confusion_matrix(keyword_labels, labels))
+
     # Add a column
-    df[f"{modelname}_{set_name}_{number_of_features}"] = labels
+    df[f"{modelname}_{balancing}_{set_name}_{number_of_features}"] = labels
+
+    # Again for the cnn
+    cnn_results = pd.read_csv("data/cnn_results.csv")
+    set_name, number_of_features, balancing = get_best_model(cnn_results)
+    modelname = "svm"
+
+    # Load the model to predict the labels
+    with open(f"data/models/{modelname}_{balancing}_{set_name}_{number_of_features}.pickle", 'rb') as f:
+        model = pickle.load(f)
+
+    # Load the features the model uses
+    with open(f"data/feature_sets/{set_name}_{number_of_features}.pickle", 'rb') as f:
+        feature_set = pickle.load(f)
+
+    # Convert feature_set to a dictionary for fast lookup
+    feature_dict = {feature: idx for idx, feature in enumerate(feature_set)}
+
+    # Collect feature data
+    features_matrix = collect_feature_data(df, feature_dict, set_name)
+    # Reshape matrix for cnn input
+    features_matrix = features_matrix.toarray()
+
+    # Predict labels for the new data
+    labels = model.predict(features_matrix)
+
+    # Print confusion matrix
+    print(confusion_matrix(keyword_labels, labels))
+
+    # Add a column
+    df[f"{modelname}_{balancing}_{set_name}_{number_of_features}"] = labels
 
     # Save the prediction results
     df.to_csv("data/stored_urls.csv", index=False)

@@ -1,5 +1,5 @@
 Set name,Number of features,Class balancing,Best parameters,Training accuracy,Test accuracy,Classification report
-all,100,Class weights,"{'num_layers': 1, 'dense_dropout': 0.6, 'dense_units': 512, 'optimizer': 'adam', 'filters_0': 256, 'kernel_size_0': 5, 'dropout_0': 0.6, 'tuner/epochs': 2, 'tuner/initial_epoch': 0, 'tuner/bracket': 4, 'tuner/round': 0}",0.7755101919174194,0.7755102040816326,"
+all,100,class_weights,"{'num_layers': 1, 'dense_dropout': 0.6, 'dense_units': 512, 'optimizer': 'adam', 'filters_0': 256, 'kernel_size_0': 5, 'dropout_0': 0.6, 'tuner/epochs': 2, 'tuner/initial_epoch': 0, 'tuner/bracket': 4, 'tuner/round': 0}",0.7755101919174194,0.7755102040816326,"
               precision    recall  f1-score   support
 
        False       0.78      1.00      0.87       114
@@ -9,7 +9,7 @@ all,100,Class weights,"{'num_layers': 1, 'dense_dropout': 0.6, 'dense_units': 51
    macro avg       0.89      0.50      0.44       147
 weighted avg       0.83      0.78      0.68       147
 "
-all,100,Oversampling,"{'num_layers': 1, 'dense_dropout': 0.6, 'dense_units': 384, 'optimizer': 'SGD', 'filters_0': 128, 'kernel_size_0': 5, 'dropout_0': 0.6, 'tuner/epochs': 2, 'tuner/initial_epoch': 0, 'tuner/bracket': 4, 'tuner/round': 0}",0.6915204524993896,0.7192982456140351,"
+all,100,oversampling,"{'num_layers': 1, 'dense_dropout': 0.6, 'dense_units': 384, 'optimizer': 'SGD', 'filters_0': 128, 'kernel_size_0': 5, 'dropout_0': 0.6, 'tuner/epochs': 2, 'tuner/initial_epoch': 0, 'tuner/bracket': 4, 'tuner/round': 0}",0.6915204524993896,0.7192982456140351,"
               precision    recall  f1-score   support
 
        False       0.66      0.92      0.77       114
@@ -19,7 +19,7 @@ all,100,Oversampling,"{'num_layers': 1, 'dense_dropout': 0.6, 'dense_units': 384
    macro avg       0.76      0.72      0.71       228
 weighted avg       0.76      0.72      0.71       228
 "
-all,1000,Class weights,"{'num_layers': 3, 'dense_dropout': 0.4, 'dense_units': 384, 'optimizer': 'adam', 'filters_0': 64, 'kernel_size_0': 7, 'dropout_0': 0.2, 'filters_1': 64, 'kernel_size_1': 5, 'dropout_1': 0.6, 'filters_2': 128, 'kernel_size_2': 5, 'dropout_2': 0.2, 'tuner/epochs': 100, 'tuner/initial_epoch': 34, 'tuner/bracket': 4, 'tuner/round': 4, 'tuner/trial_id': '0142'}",0.8276643753051758,0.7891156462585034,"
+all,1000,class_weights,"{'num_layers': 3, 'dense_dropout': 0.4, 'dense_units': 384, 'optimizer': 'adam', 'filters_0': 64, 'kernel_size_0': 7, 'dropout_0': 0.2, 'filters_1': 64, 'kernel_size_1': 5, 'dropout_1': 0.6, 'filters_2': 128, 'kernel_size_2': 5, 'dropout_2': 0.2, 'tuner/epochs': 100, 'tuner/initial_epoch': 34, 'tuner/bracket': 4, 'tuner/round': 4, 'tuner/trial_id': '0142'}",0.8276643753051758,0.7891156462585034,"
               precision    recall  f1-score   support
 
        False       0.81      0.96      0.88       114
@@ -29,7 +29,7 @@ all,1000,Class weights,"{'num_layers': 3, 'dense_dropout': 0.4, 'dense_units': 3
    macro avg       0.70      0.58      0.59       147
 weighted avg       0.76      0.79      0.75       147
 "
-all,1000,Oversampling,"{'num_layers': 3, 'dense_dropout': 0.4, 'dense_units': 256, 'optimizer': 'SGD', 'filters_0': 64, 'kernel_size_0': 3, 'dropout_0': 0.2, 'filters_1': 128, 'kernel_size_1': 7, 'dropout_1': 0.2, 'filters_2': 64, 'kernel_size_2': 5, 'dropout_2': 0.2, 'tuner/epochs': 34, 'tuner/initial_epoch': 12, 'tuner/bracket': 4, 'tuner/round': 3, 'tuner/trial_id': '0134'}",0.7456140518188477,0.7412280701754386,"
+all,1000,oversampling,"{'num_layers': 3, 'dense_dropout': 0.4, 'dense_units': 256, 'optimizer': 'SGD', 'filters_0': 64, 'kernel_size_0': 3, 'dropout_0': 0.2, 'filters_1': 128, 'kernel_size_1': 7, 'dropout_1': 0.2, 'filters_2': 64, 'kernel_size_2': 5, 'dropout_2': 0.2, 'tuner/epochs': 34, 'tuner/initial_epoch': 12, 'tuner/bracket': 4, 'tuner/round': 3, 'tuner/trial_id': '0134'}",0.7456140518188477,0.7412280701754386,"
               precision    recall  f1-score   support
 
        False       0.71      0.82      0.76       114
@@ -39,7 +39,7 @@ all,1000,Oversampling,"{'num_layers': 3, 'dense_dropout': 0.4, 'dense_units': 25
    macro avg       0.75      0.74      0.74       228
 weighted avg       0.75      0.74      0.74       228
 "
-all,10000,Class weights,"{'num_layers': 1, 'dense_dropout': 0.2, 'dense_units': 384, 'optimizer': 'RMSprop', 'filters_0': 128, 'kernel_size_0': 7, 'dropout_0': 0.2, 'filters_1': 256, 'kernel_size_1': 7, 'dropout_1': 0.4, 'filters_2': 64, 'kernel_size_2': 5, 'dropout_2': 0.4, 'tuner/epochs': 4, 'tuner/initial_epoch': 2, 'tuner/bracket': 4, 'tuner/round': 1, 'tuner/trial_id': '0028'}",0.8231292366981506,0.7959183673469388,"
+all,10000,class_weights,"{'num_layers': 1, 'dense_dropout': 0.2, 'dense_units': 384, 'optimizer': 'RMSprop', 'filters_0': 128, 'kernel_size_0': 7, 'dropout_0': 0.2, 'filters_1': 256, 'kernel_size_1': 7, 'dropout_1': 0.4, 'filters_2': 64, 'kernel_size_2': 5, 'dropout_2': 0.4, 'tuner/epochs': 4, 'tuner/initial_epoch': 2, 'tuner/bracket': 4, 'tuner/round': 1, 'tuner/trial_id': '0028'}",0.8231292366981506,0.7959183673469388,"
               precision    recall  f1-score   support
 
        False       0.82      0.94      0.88       114
@@ -49,7 +49,7 @@ all,10000,Class weights,"{'num_layers': 1, 'dense_dropout': 0.2, 'dense_units': 
    macro avg       0.71      0.62      0.64       147
 weighted avg       0.77      0.80      0.77       147
 "
-all,10000,Oversampling,"{'num_layers': 2, 'dense_dropout': 0.2, 'dense_units': 512, 'optimizer': 'adam', 'filters_0': 128, 'kernel_size_0': 7, 'dropout_0': 0.2, 'filters_1': 128, 'kernel_size_1': 3, 'dropout_1': 0.2, 'filters_2': 64, 'kernel_size_2': 3, 'dropout_2': 0.2, 'tuner/epochs': 12, 'tuner/initial_epoch': 4, 'tuner/bracket': 3, 'tuner/round': 1, 'tuner/trial_id': '0171'}",0.7748538255691528,0.7675438596491229,"
+all,10000,oversampling,"{'num_layers': 2, 'dense_dropout': 0.2, 'dense_units': 512, 'optimizer': 'adam', 'filters_0': 128, 'kernel_size_0': 7, 'dropout_0': 0.2, 'filters_1': 128, 'kernel_size_1': 3, 'dropout_1': 0.2, 'filters_2': 64, 'kernel_size_2': 3, 'dropout_2': 0.2, 'tuner/epochs': 12, 'tuner/initial_epoch': 4, 'tuner/bracket': 3, 'tuner/round': 1, 'tuner/trial_id': '0171'}",0.7748538255691528,0.7675438596491229,"
               precision    recall  f1-score   support
 
        False       0.73      0.86      0.79       114
@@ -59,7 +59,7 @@ all,10000,Oversampling,"{'num_layers': 2, 'dense_dropout': 0.2, 'dense_units': 5
    macro avg       0.78      0.77      0.77       228
 weighted avg       0.78      0.77      0.77       228
 "
-identifier,100,Class weights,"{'num_layers': 3, 'dense_dropout': 0.2, 'dense_units': 512, 'optimizer': 'adam', 'filters_0': 64, 'kernel_size_0': 5, 'dropout_0': 0.6, 'filters_1': 256, 'kernel_size_1': 5, 'dropout_1': 0.2, 'tuner/epochs': 2, 'tuner/initial_epoch': 0, 'tuner/bracket': 4, 'tuner/round': 0, 'filters_2': 64, 'kernel_size_2': 3, 'dropout_2': 0.2}",0.7755101919174194,0.7755102040816326,"
+identifier,100,class_weights,"{'num_layers': 3, 'dense_dropout': 0.2, 'dense_units': 512, 'optimizer': 'adam', 'filters_0': 64, 'kernel_size_0': 5, 'dropout_0': 0.6, 'filters_1': 256, 'kernel_size_1': 5, 'dropout_1': 0.2, 'tuner/epochs': 2, 'tuner/initial_epoch': 0, 'tuner/bracket': 4, 'tuner/round': 0, 'filters_2': 64, 'kernel_size_2': 3, 'dropout_2': 0.2}",0.7755101919174194,0.7755102040816326,"
               precision    recall  f1-score   support
 
        False       0.78      1.00      0.87       114
@@ -69,7 +69,7 @@ identifier,100,Class weights,"{'num_layers': 3, 'dense_dropout': 0.2, 'dense_uni
    macro avg       0.89      0.50      0.44       147
 weighted avg       0.83      0.78      0.68       147
 "
-identifier,100,Oversampling,"{'num_layers': 1, 'dense_dropout': 0.6, 'dense_units': 256, 'optimizer': 'RMSprop', 'filters_0': 64, 'kernel_size_0': 3, 'dropout_0': 0.6, 'tuner/epochs': 2, 'tuner/initial_epoch': 0, 'tuner/bracket': 4, 'tuner/round': 0}",0.6915204524993896,0.7192982456140351,"
+identifier,100,oversampling,"{'num_layers': 1, 'dense_dropout': 0.6, 'dense_units': 256, 'optimizer': 'RMSprop', 'filters_0': 64, 'kernel_size_0': 3, 'dropout_0': 0.6, 'tuner/epochs': 2, 'tuner/initial_epoch': 0, 'tuner/bracket': 4, 'tuner/round': 0}",0.6915204524993896,0.7192982456140351,"
               precision    recall  f1-score   support
 
        False       0.66      0.92      0.77       114
@@ -79,7 +79,7 @@ identifier,100,Oversampling,"{'num_layers': 1, 'dense_dropout': 0.6, 'dense_unit
    macro avg       0.76      0.72      0.71       228
 weighted avg       0.76      0.72      0.71       228
 "
-identifier,1000,Class weights,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_units': 256, 'optimizer': 'RMSprop', 'filters_0': 64, 'kernel_size_0': 7, 'dropout_0': 0.6, 'filters_1': 128, 'kernel_size_1': 7, 'dropout_1': 0.4, 'filters_2': 128, 'kernel_size_2': 3, 'dropout_2': 0.4, 'tuner/epochs': 100, 'tuner/initial_epoch': 34, 'tuner/bracket': 1, 'tuner/round': 1, 'tuner/trial_id': '0243'}",0.8594104051589966,0.7959183673469388,"
+identifier,1000,class_weights,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_units': 256, 'optimizer': 'RMSprop', 'filters_0': 64, 'kernel_size_0': 7, 'dropout_0': 0.6, 'filters_1': 128, 'kernel_size_1': 7, 'dropout_1': 0.4, 'filters_2': 128, 'kernel_size_2': 3, 'dropout_2': 0.4, 'tuner/epochs': 100, 'tuner/initial_epoch': 34, 'tuner/bracket': 1, 'tuner/round': 1, 'tuner/trial_id': '0243'}",0.8594104051589966,0.7959183673469388,"
               precision    recall  f1-score   support
 
        False       0.82      0.95      0.88       114
@@ -89,7 +89,7 @@ identifier,1000,Class weights,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_un
    macro avg       0.71      0.61      0.63       147
 weighted avg       0.77      0.80      0.77       147
 "
-identifier,1000,Oversampling,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_units': 384, 'optimizer': 'adam', 'filters_0': 128, 'kernel_size_0': 7, 'dropout_0': 0.4, 'filters_1': 256, 'kernel_size_1': 3, 'dropout_1': 0.2, 'filters_2': 64, 'kernel_size_2': 3, 'dropout_2': 0.4, 'tuner/epochs': 34, 'tuner/initial_epoch': 12, 'tuner/bracket': 3, 'tuner/round': 2, 'tuner/trial_id': '0202'}",0.7719298005104065,0.7675438596491229,"
+identifier,1000,oversampling,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_units': 384, 'optimizer': 'adam', 'filters_0': 128, 'kernel_size_0': 7, 'dropout_0': 0.4, 'filters_1': 256, 'kernel_size_1': 3, 'dropout_1': 0.2, 'filters_2': 64, 'kernel_size_2': 3, 'dropout_2': 0.4, 'tuner/epochs': 34, 'tuner/initial_epoch': 12, 'tuner/bracket': 3, 'tuner/round': 2, 'tuner/trial_id': '0202'}",0.7719298005104065,0.7675438596491229,"
               precision    recall  f1-score   support
 
        False       0.74      0.82      0.78       114
@@ -99,7 +99,7 @@ identifier,1000,Oversampling,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_uni
    macro avg       0.77      0.77      0.77       228
 weighted avg       0.77      0.77      0.77       228
 "
-identifier,10000,Class weights,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_units': 512, 'optimizer': 'RMSprop', 'filters_0': 64, 'kernel_size_0': 7, 'dropout_0': 0.2, 'filters_1': 256, 'kernel_size_1': 5, 'dropout_1': 0.4, 'filters_2': 256, 'kernel_size_2': 3, 'dropout_2': 0.4, 'tuner/epochs': 34, 'tuner/initial_epoch': 12, 'tuner/bracket': 4, 'tuner/round': 3, 'tuner/trial_id': '0134'}",0.795918345451355,0.7619047619047619,"
+identifier,10000,class_weights,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_units': 512, 'optimizer': 'RMSprop', 'filters_0': 64, 'kernel_size_0': 7, 'dropout_0': 0.2, 'filters_1': 256, 'kernel_size_1': 5, 'dropout_1': 0.4, 'filters_2': 256, 'kernel_size_2': 3, 'dropout_2': 0.4, 'tuner/epochs': 34, 'tuner/initial_epoch': 12, 'tuner/bracket': 4, 'tuner/round': 3, 'tuner/trial_id': '0134'}",0.795918345451355,0.7619047619047619,"
               precision    recall  f1-score   support
 
        False       0.78      0.96      0.86       114
@@ -109,7 +109,7 @@ identifier,10000,Class weights,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_u
    macro avg       0.56      0.51      0.48       147
 weighted avg       0.68      0.76      0.69       147
 "
-identifier,10000,Oversampling,"{'num_layers': 1, 'dense_dropout': 0.2, 'dense_units': 384, 'optimizer': 'adam', 'filters_0': 256, 'kernel_size_0': 7, 'dropout_0': 0.4, 'filters_1': 256, 'kernel_size_1': 5, 'dropout_1': 0.6, 'filters_2': 64, 'kernel_size_2': 5, 'dropout_2': 0.2, 'tuner/epochs': 100, 'tuner/initial_epoch': 34, 'tuner/bracket': 4, 'tuner/round': 4, 'tuner/trial_id': '0142'}",0.6973684430122375,0.6842105263157895,"
+identifier,10000,oversampling,"{'num_layers': 1, 'dense_dropout': 0.2, 'dense_units': 384, 'optimizer': 'adam', 'filters_0': 256, 'kernel_size_0': 7, 'dropout_0': 0.4, 'filters_1': 256, 'kernel_size_1': 5, 'dropout_1': 0.6, 'filters_2': 64, 'kernel_size_2': 5, 'dropout_2': 0.2, 'tuner/epochs': 100, 'tuner/initial_epoch': 34, 'tuner/bracket': 4, 'tuner/round': 4, 'tuner/trial_id': '0142'}",0.6973684430122375,0.6842105263157895,"
               precision    recall  f1-score   support
 
        False       0.70      0.64      0.67       114
@@ -119,7 +119,7 @@ identifier,10000,Oversampling,"{'num_layers': 1, 'dense_dropout': 0.2, 'dense_un
    macro avg       0.69      0.68      0.68       228
 weighted avg       0.69      0.68      0.68       228
 "
-literal,100,Class weights,"{'num_layers': 1, 'dense_dropout': 0.2, 'dense_units': 128, 'optimizer': 'SGD', 'filters_0': 128, 'kernel_size_0': 7, 'dropout_0': 0.6, 'filters_1': 256, 'kernel_size_1': 5, 'dropout_1': 0.6, 'filters_2': 128, 'kernel_size_2': 7, 'dropout_2': 0.2, 'tuner/epochs': 2, 'tuner/initial_epoch': 0, 'tuner/bracket': 4, 'tuner/round': 0}",0.7755101919174194,0.7755102040816326,"
+literal,100,class_weights,"{'num_layers': 1, 'dense_dropout': 0.2, 'dense_units': 128, 'optimizer': 'SGD', 'filters_0': 128, 'kernel_size_0': 7, 'dropout_0': 0.6, 'filters_1': 256, 'kernel_size_1': 5, 'dropout_1': 0.6, 'filters_2': 128, 'kernel_size_2': 7, 'dropout_2': 0.2, 'tuner/epochs': 2, 'tuner/initial_epoch': 0, 'tuner/bracket': 4, 'tuner/round': 0}",0.7755101919174194,0.7755102040816326,"
               precision    recall  f1-score   support
 
        False       0.78      1.00      0.87       114
@@ -129,7 +129,7 @@ literal,100,Class weights,"{'num_layers': 1, 'dense_dropout': 0.2, 'dense_units'
    macro avg       0.89      0.50      0.44       147
 weighted avg       0.83      0.78      0.68       147
 "
-literal,100,Oversampling,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_units': 512, 'optimizer': 'SGD', 'filters_0': 128, 'kernel_size_0': 7, 'dropout_0': 0.6, 'tuner/epochs': 2, 'tuner/initial_epoch': 0, 'tuner/bracket': 4, 'tuner/round': 0}",0.6812865734100342,0.6973684210526315,"
+literal,100,oversampling,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_units': 512, 'optimizer': 'SGD', 'filters_0': 128, 'kernel_size_0': 7, 'dropout_0': 0.6, 'tuner/epochs': 2, 'tuner/initial_epoch': 0, 'tuner/bracket': 4, 'tuner/round': 0}",0.6812865734100342,0.6973684210526315,"
               precision    recall  f1-score   support
 
        False       0.64      0.92      0.75       114
@@ -139,7 +139,7 @@ literal,100,Oversampling,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_units':
    macro avg       0.75      0.70      0.68       228
 weighted avg       0.75      0.70      0.68       228
 "
-literal,1000,Class weights,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_units': 512, 'optimizer': 'SGD', 'filters_0': 256, 'kernel_size_0': 7, 'dropout_0': 0.2, 'filters_1': 128, 'kernel_size_1': 7, 'dropout_1': 0.2, 'filters_2': 64, 'kernel_size_2': 7, 'dropout_2': 0.4, 'tuner/epochs': 100, 'tuner/initial_epoch': 34, 'tuner/bracket': 4, 'tuner/round': 4, 'tuner/trial_id': '0142'}",0.8321995735168457,0.7959183673469388,"
+literal,1000,class_weights,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_units': 512, 'optimizer': 'SGD', 'filters_0': 256, 'kernel_size_0': 7, 'dropout_0': 0.2, 'filters_1': 128, 'kernel_size_1': 7, 'dropout_1': 0.2, 'filters_2': 64, 'kernel_size_2': 7, 'dropout_2': 0.4, 'tuner/epochs': 100, 'tuner/initial_epoch': 34, 'tuner/bracket': 4, 'tuner/round': 4, 'tuner/trial_id': '0142'}",0.8321995735168457,0.7959183673469388,"
               precision    recall  f1-score   support
 
        False       0.81      0.96      0.88       114
@@ -149,7 +149,7 @@ literal,1000,Class weights,"{'num_layers': 1, 'dense_dropout': 0.4, 'dense_units
    macro avg       0.71      0.60      0.61       147
 weighted avg       0.77      0.80      0.76       147
 "
-literal,1000,Oversampling,"{'num_layers': 1, 'dense_dropout': 0.2, 'dense_units': 512, 'optimizer': 'adam', 'filters_0': 64, 'kernel_size_0': 5, 'dropout_0': 0.6, 'filters_1': 256, 'kernel_size_1': 3, 'dropout_1': 0.4, 'filters_2': 256, 'kernel_size_2': 5, 'dropout_2': 0.6, 'tuner/epochs': 100, 'tuner/initial_epoch': 34, 'tuner/bracket': 4, 'tuner/round': 4, 'tuner/trial_id': '0143'}",0.7675438523292542,0.7763157894736842,"
+literal,1000,oversampling,"{'num_layers': 1, 'dense_dropout': 0.2, 'dense_units': 512, 'optimizer': 'adam', 'filters_0': 64, 'kernel_size_0': 5, 'dropout_0': 0.6, 'filters_1': 256, 'kernel_size_1': 3, 'dropout_1': 0.4, 'filters_2': 256, 'kernel_size_2': 5, 'dropout_2': 0.6, 'tuner/epochs': 100, 'tuner/initial_epoch': 34, 'tuner/bracket': 4, 'tuner/round': 4, 'tuner/trial_id': '0143'}",0.7675438523292542,0.7763157894736842,"
               precision    recall  f1-score   support
 
        False       0.74      0.86      0.79       114
@@ -159,7 +159,7 @@ literal,1000,Oversampling,"{'num_layers': 1, 'dense_dropout': 0.2, 'dense_units'
    macro avg       0.78      0.78      0.77       228
 weighted avg       0.78      0.78      0.77       228
 "
-literal,10000,Class weights,"{'num_layers': 1, 'dense_dropout': 0.6, 'dense_units': 384, 'optimizer': 'RMSprop', 'filters_0': 256, 'kernel_size_0': 7, 'dropout_0': 0.6, 'filters_1': 128, 'kernel_size_1': 7, 'dropout_1': 0.4, 'filters_2': 128, 'kernel_size_2': 5, 'dropout_2': 0.4, 'tuner/epochs': 4, 'tuner/initial_epoch': 0, 'tuner/bracket': 3, 'tuner/round': 0}",0.8095238208770752,0.7755102040816326,"
+literal,10000,class_weights,"{'num_layers': 1, 'dense_dropout': 0.6, 'dense_units': 384, 'optimizer': 'RMSprop', 'filters_0': 256, 'kernel_size_0': 7, 'dropout_0': 0.6, 'filters_1': 128, 'kernel_size_1': 7, 'dropout_1': 0.4, 'filters_2': 128, 'kernel_size_2': 5, 'dropout_2': 0.4, 'tuner/epochs': 4, 'tuner/initial_epoch': 0, 'tuner/bracket': 3, 'tuner/round': 0}",0.8095238208770752,0.7755102040816326,"
               precision    recall  f1-score   support
 
        False       0.81      0.92      0.86       114
@@ -169,7 +169,7 @@ literal,10000,Class weights,"{'num_layers': 1, 'dense_dropout': 0.6, 'dense_unit
    macro avg       0.66      0.60      0.61       147
 weighted avg       0.74      0.78      0.75       147
 "
-literal,10000,Oversampling,"{'num_layers': 3, 'dense_dropout': 0.4, 'dense_units': 512, 'optimizer': 'SGD', 'filters_0': 64, 'kernel_size_0': 7, 'dropout_0': 0.2, 'filters_1': 256, 'kernel_size_1': 5, 'dropout_1': 0.2, 'filters_2': 256, 'kernel_size_2': 7, 'dropout_2': 0.4, 'tuner/epochs': 34, 'tuner/initial_epoch': 12, 'tuner/bracket': 4, 'tuner/round': 3, 'tuner/trial_id': '0137'}",0.6812865734100342,0.6929824561403509,"
+literal,10000,oversampling,"{'num_layers': 3, 'dense_dropout': 0.4, 'dense_units': 512, 'optimizer': 'SGD', 'filters_0': 64, 'kernel_size_0': 7, 'dropout_0': 0.2, 'filters_1': 256, 'kernel_size_1': 5, 'dropout_1': 0.2, 'filters_2': 256, 'kernel_size_2': 7, 'dropout_2': 0.4, 'tuner/epochs': 34, 'tuner/initial_epoch': 12, 'tuner/bracket': 4, 'tuner/round': 3, 'tuner/trial_id': '0137'}",0.6812865734100342,0.6929824561403509,"
               precision    recall  f1-score   support
 
        False       0.76      0.57      0.65       114
