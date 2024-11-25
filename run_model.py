@@ -1,4 +1,5 @@
 import pickle
+import numpy as np
 import pandas as pd
 from scipy.sparse import lil_matrix
 from sklearn.metrics import confusion_matrix
@@ -50,67 +51,57 @@ def get_best_model(results_df):
     
     return set_name, number_of_features, balancing
 
+def create_and_add_column(df, modelname, set_name, number_of_features, balancing):
+    # Load the model to predict the labels
+    with open(f"data/models/{modelname}_{balancing}_{set_name}_{number_of_features}.pickle", 'rb') as f:
+        model = pickle.load(f)
+
+    # Load the features the model uses
+    with open(f"data/feature_sets/{set_name}_{number_of_features}.pickle", 'rb') as f:
+        feature_set = pickle.load(f)
+
+    # Convert feature_set to a dictionary for fast lookup
+    feature_dict = {feature: idx for idx, feature in enumerate(feature_set)}
+
+    # Collect feature data
+    features_matrix = collect_feature_data(df, feature_dict, set_name)
+
+    # Reshape matrix for cnn or mlp input
+    if modelname != "svm":
+        features_matrix = features_matrix.toarray()
+
+    # Predict labels for the new data
+    labels = model.predict(features_matrix)
+
+    # Convert labels from probability to a boolean label for cnn or mlp labels
+    if modelname != "svm":
+        labels = (labels > 0.5).astype(int)  # Threshold at 0.5
+
+    # Print confusion matrix
+    print(confusion_matrix(keyword_labels, labels))
+
+    # Add a column
+    df[f"{modelname}_{balancing}_{set_name}_{number_of_features}"] = labels
+
 if __name__ == "__main__":
     # Load the existing data
     df = pd.read_csv("data/stored_urls.csv")
     keyword_labels = df['keywords'].fillna(2).tolist()
 
+    # Add column for best svm model
     svm_results = pd.read_csv("data/svm_results.csv")
     set_name, number_of_features, balancing = get_best_model(svm_results)
-    modelname = "svm"
-    
-    # Load the model to predict the labels
-    with open(f"data/models/{modelname}_{balancing}_{set_name}_{number_of_features}.pickle", 'rb') as f:
-        model = pickle.load(f)
+    create_and_add_column(df, "svm", set_name, number_of_features, balancing)
 
-    # Load the features the model uses
-    with open(f"data/feature_sets/{set_name}_{number_of_features}.pickle", 'rb') as f:
-        feature_set = pickle.load(f)
-
-    # Convert feature_set to a dictionary for fast lookup
-    feature_dict = {feature: idx for idx, feature in enumerate(feature_set)}
-
-    # Collect feature data
-    features_matrix = collect_feature_data(df, feature_dict, set_name)
-
-    # Predict labels for the new data
-    labels = model.predict(features_matrix)
-
-    # Print confusion matrix
-    print(confusion_matrix(keyword_labels, labels))
-
-    # Add a column
-    df[f"{modelname}_{balancing}_{set_name}_{number_of_features}"] = labels
-
-    # Again for the cnn
+    # Add column for best cnn model
     cnn_results = pd.read_csv("data/cnn_results.csv")
     set_name, number_of_features, balancing = get_best_model(cnn_results)
-    modelname = "svm"
-
-    # Load the model to predict the labels
-    with open(f"data/models/{modelname}_{balancing}_{set_name}_{number_of_features}.pickle", 'rb') as f:
-        model = pickle.load(f)
-
-    # Load the features the model uses
-    with open(f"data/feature_sets/{set_name}_{number_of_features}.pickle", 'rb') as f:
-        feature_set = pickle.load(f)
-
-    # Convert feature_set to a dictionary for fast lookup
-    feature_dict = {feature: idx for idx, feature in enumerate(feature_set)}
-
-    # Collect feature data
-    features_matrix = collect_feature_data(df, feature_dict, set_name)
-    # Reshape matrix for cnn input
-    features_matrix = features_matrix.toarray()
-
-    # Predict labels for the new data
-    labels = model.predict(features_matrix)
-
-    # Print confusion matrix
-    print(confusion_matrix(keyword_labels, labels))
-
-    # Add a column
-    df[f"{modelname}_{balancing}_{set_name}_{number_of_features}"] = labels
+    create_and_add_column(df, "cnn", set_name, number_of_features, balancing)
+    
+    # Add column for best mlp model
+    mlp_results = pd.read_csv("data/mlp_results.csv")
+    set_name, number_of_features, balancing = get_best_model(mlp_results)
+    create_and_add_column(df, "mlp", set_name, number_of_features, balancing)
 
     # Save the prediction results
     df.to_csv("data/stored_urls.csv", index=False)
