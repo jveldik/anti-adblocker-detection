@@ -75,7 +75,7 @@ def create_and_add_column(df, modelname, set_name, number_of_features, balancing
 
     # Convert labels from probability to a boolean label for cnn or mlp labels
     if modelname != "svm":
-        labels = (labels > 0.5).astype(int)  # Threshold at 0.5
+        labels = (labels > 0.5).astype(bool)  # Threshold at 0.5
 
     # Print confusion matrix
     print(confusion_matrix(keyword_labels, labels))
